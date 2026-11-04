@@ -11,6 +11,7 @@
 import { createHash } from 'node:crypto';
 import { projects as legacyFrontendProjects, demoContributor } from '../frontend/src/data/mockData.ts';
 import { LEGACY_PROJECTS } from './legacy-projects.mjs';
+import { canonicalSector } from '../backend/src/features/discovery/sectors.ts';
 
 /** Fixed namespace for all demo UUIDs. Never reuse it for real data. */
 export const DEMO_NAMESPACE = '6e5f0a3c-9b1d-5c7e-8f24-0d3a1b2c4e5f';
@@ -223,6 +224,7 @@ export function validateDataset(rows) {
     text('projects', p, 'location', 120);
     text('projects', p, 'owner_display_name', 120);
     oneOf('projects', p, 'stage', ENUMS.stage);
+    if (canonicalSector(p.sector) !== p.sector) problems.push(`${where('projects', p)} sector="${p.sector}" is not a listed sector`);
     oneOf('projects', p, 'status', ENUMS.status);
     if (p.visibility !== 'public') problems.push(`${where('projects', p)} demo projects are published`);
     if (!p.problem.includes(FICTIONAL_NOTE)) problems.push(`${where('projects', p)} missing fictional label`);

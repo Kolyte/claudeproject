@@ -63,7 +63,7 @@ const projectBody = (title) => ({
   pitch: 'Fictional end-to-end test project. Not real.',
   problem: 'Fictional problem used by automated permission checks.',
   solution: 'Fictional solution used by automated permission checks.',
-  sector: 'Testing',
+  sector: 'Software Engineering',
   location: 'Newcastle',
   stage: 'idea',
 });
@@ -121,6 +121,14 @@ describe('API journey and permissions', { skip, concurrency: false }, () => {
     const spoof = await api(founder, 'POST', '/projects', { ...projectBody(`[E2E fictional] spoof ${RUN}`), ownerId: contributor.id });
     if (spoof.status === 201) assert.equal(spoof.json.data.ownerId, founder.id, 'ownerId must be server-derived');
     else expectStatus(spoof, 400, 'unknown field rejected');
+  });
+
+  test('sector must be one of the fixed list and is normalised', async () => {
+    expectStatus(await api(founder, 'POST', '/projects', { ...projectBody(`[E2E fictional] bad sector ${RUN}`), sector: 'Fin' }), 400, 'unlisted sector');
+    const res = await api(founder, 'PATCH', `/projects/${projectId}`, { sector: 'machine learning' });
+    expectStatus(res, 200, 'listed sector, any case');
+    assert.equal(res.json.data.sector, 'Machine Learning');
+    expectStatus(await api(null, 'GET', '/discover/projects?sector=not-a-sector'), 400, 'unlisted sector filter');
   });
 
   test('drafts are hidden from anonymous and unrelated users and from discovery', async () => {

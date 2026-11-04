@@ -5,6 +5,7 @@ import type { ApiResponse, Page, Project, ProjectStage, ProjectStatus, Visibilit
 import { useAuth } from '../auth'
 import { ProjectActivity } from '../activity'
 import { ProjectNeeds } from '../opportunities'
+import { SectorInput } from '../discovery'
 import { useResource } from '../../lib/useResource'
 import { message, save } from '../../lib/api'
 import { Feedback, Field, Pager } from '../../components/ui/Feedback'
@@ -68,7 +69,7 @@ function ProjectForm({ existing }: { existing?: Project }) {
       <Field label="One-line pitch"><input required maxLength={300} value={form.pitch} onChange={e => set('pitch', e.target.value)} /></Field>
       <Field label="Problem"><textarea required maxLength={5000} value={form.problem} onChange={e => set('problem', e.target.value)} /></Field>
       <Field label="Solution"><textarea required maxLength={5000} value={form.solution} onChange={e => set('solution', e.target.value)} /></Field>
-      <div className="form-row"><Field label="Sector"><input required maxLength={120} value={form.sector} onChange={e => set('sector', e.target.value)} /></Field><Field label="Location"><input required maxLength={120} value={form.location} onChange={e => set('location', e.target.value)} /></Field></div>
+      <div className="form-row"><SectorInput label="Sector" className="field" required value={form.sector} onChange={sector => set('sector', sector)} /><Field label="Location"><input required maxLength={120} value={form.location} onChange={e => set('location', e.target.value)} /></Field></div>
       <Field label="Stage"><select value={form.stage} onChange={e => set('stage', e.target.value as ProjectStage)}>{['idea', 'prototype', 'mvp', 'launched'].map(value => <option key={value}>{value}</option>)}</select></Field>
       {existing && <div className="form-row"><Field label="Status"><select value={form.status} onChange={e => set('status', e.target.value as ProjectStatus)}>{['active', 'paused', 'completed'].map(value => <option key={value}>{value}</option>)}</select></Field><Field label="Visibility"><select value={form.visibility} onChange={e => set('visibility', e.target.value as Visibility)}><option value="draft">Private draft</option><option value="public">Published</option></select></Field></div>}
     </section>

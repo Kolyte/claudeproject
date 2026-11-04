@@ -12,7 +12,8 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint src",
-    "test": "tsx --test src/lib/*.test.ts"
+    "test": "tsx --test src/lib/*.test.ts",
+    "smoke:production": "node dist/lib/production-smoke.js"
   },
   "dependencies": {
     "@neo/contracts": "file:../shared",

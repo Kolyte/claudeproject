@@ -56,6 +56,11 @@ const ok = (q: Record<string, unknown>) => {
   return (r as Extract<typeof r, { ok: true }>).filters;
 };
 
+test('sector filter accepts listed sectors in any case and normalises them', () => {
+  assert.deepEqual(ok({ sector: ' fintech ' }), { sector: 'Fintech', limit: 20, offset: 0 });
+  assert.deepEqual(ok({ sector: 'MACHINE LEARNING' }), { sector: 'Machine Learning', limit: 20, offset: 0 });
+});
+
 test('defaults and trimming', () => {
   assert.deepEqual(ok({}), { limit: 20, offset: 0 });
   assert.deepEqual(ok({ q: '  flood ', location: '', stage: 'MVP', limit: '5', offset: '10' }), {
@@ -65,7 +70,7 @@ test('defaults and trimming', () => {
 
 test('invalid parameters are rejected with field messages', () => {
   for (const q of [{ limit: '0' }, { limit: '51' }, { limit: '2.5' }, { offset: '-1' }, { stage: 'unicorn' },
-    { skill: ['a', 'b'] }, { q: 'x'.repeat(121) }, { limit: '1e1' }]) {
+    { skill: ['a', 'b'] }, { q: 'x'.repeat(121) }, { limit: '1e1' }, { sector: 'Fin' }, { sector: 'Testing' }]) {
     const r = parseDiscoveryFilters(q);
     assert.equal(r.ok, false, JSON.stringify(q));
   }

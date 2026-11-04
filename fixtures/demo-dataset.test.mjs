@@ -54,11 +54,13 @@ test('validator catches contract violations', () => {
   bad.milestones[0].verification = 'verified';
   bad.project_needs[0].hours_per_week = 0;
   bad.projects[0].stage = 'Early users';
+  bad.projects[1].sector = 'Work & HR';
   for (const n of bad.project_needs) if (n.status === 'closed') n.status = 'open';
   const problems = validateDataset(bad).join('\n');
   assert.match(problems, /self_reported/);
   assert.match(problems, /hours 1–80/);
   assert.match(problems, /stage="Early users"/);
+  assert.match(problems, /not a listed sector/);
   assert.match(problems, /closed need/);
 });
 

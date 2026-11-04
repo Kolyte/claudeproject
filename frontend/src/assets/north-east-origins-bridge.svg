@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" fill="none">
+  <title>North East Origins bridge</title>
+  <desc>An arched North East bridge above a flowing river, with a yellow rising sun and warm paper steelwork.</desc>
+  <path d="M65 122a115 115 0 0 1 230 0" stroke="#ffd300" stroke-width="12"/>
+  <g stroke="#eeecdf" stroke-linejoin="round">
+    <path d="M47 161Q180 -5 313 161" stroke-width="9"/>
+    <path d="M54 161Q180 25 306 161" stroke-width="4"/>
+    <path d="M65 143v18m25-45v45m28-67v67m30-80v80m32-85v85m32-80v80m30-67v67m28-45v45m25-18v18" stroke-width="3"/>
+    <path d="m67 139 23 5 3-30 25 10 5-31 25 17 7-30 25 23 25-23 7 30 25-17 5 31 25-10 3 30 23-5" stroke-width="3"/>
+    <path d="M37 166h286" stroke-width="8"/>
+    <path d="M24 192V141h18v51m276 0v-51h18v51" stroke-width="8"/>
+    <path d="M19 136h28m266 0h28" stroke-width="5"/>
+    <path d="m42 192 20-26m256 26-20-26" stroke-width="7"/>
+  </g>
+  <path d="M51 204c43-32 82-32 129-11s84 26 139-2c-47 40-89 38-140 16S99 185 51 204Z" fill="#0098d4"/>
+</svg>
