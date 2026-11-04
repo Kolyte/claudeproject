@@ -1,8 +1,16 @@
-# Known errors
+# Historical QA findings and current follow-up
 
-Findings from the QA audit on 4 November 2026 of `p4/opportunities` at `8e4e59c` (PR #6 plus main at that time). The audit found no crashes, data leaks or security failures.
+Findings from the local QA audit on 4 November 2026 of `p4/opportunities` at `8e4e59c` (PR #6 plus main at that time). No crashes, data leaks or security failures were observed within that audit's coverage; this is not a general security assurance.
 
-Assigned people are the P1–P5 lanes in `coordination/ownership.json`. Where several lanes are listed, each fixes its own part. Issues marked **PR #6** are in code that is only on `p4/opportunities` until that PR merges.
+Assigned people are the P1–P5 lanes in `coordination/ownership.json`. Where several lanes are listed, each fixes its own part. **PR #6 is now merged.** Its markers below identify the original feature source, not an outstanding merge. The approved redesign, self-hosted fonts, bridge logo and sector changes are also integrated. Preserve the current design while fixing reproduced issues.
+
+## How to use this report now
+
+The 18 rows below retain the original observations and suggested fixes for reproducibility; they are not 18 freshly reproduced failures on current main. Findings 1 (orange primary-button contrast), 5 (header measurements), 15 (touch-target measurements) and 17 (unloaded Inter) must be re-evaluated after the redesign. Current styling uses different button colours and self-hosted DM Sans/Space Grotesk; the orange/Inter assumptions are superseded. Do not restore older styles to reproduce them.
+
+Source review during the documentation refresh still finds newest-first needs pagination, no role title in Application and an hours input using valueAsNumber, supporting follow-up for 3, 7 and 11 without replacing runtime reproduction. [PR #15](https://github.com/Kolyte/claudeproject/pull/15) is now merged: it fixes the discovery-card portion of 2 and the Explore heading order in 16, while retaining h3 under the landing page's section h2. Its recorded local browser result is 8/8, including a regression at 320px with maximum-length text. P2/P4 portions of 2 remain separate. Recheck all other rows on the selected release before closing or treating them as blockers. Live assignments/results belong in task issues; this file is the audit reference.
+
+P1 separately registers this exact P4-owned documentation path in the ownership policy before this report merges. The human authorized updating documentation and merging PRs while keeping the design; no application fixes or deployment are claimed by this report.
 
 | Priority | Count |
 |---|---|
@@ -43,10 +51,10 @@ Assigned people are the P1–P5 lanes in `coordination/ownership.json`. Where se
 | 17 | Inter is declared but never loaded, so the font differs by device. | Global styles | P1 | Load the font, or remove it from the stack |
 | 18 | Loose validation. "react, React" saves as two skills, and milestones can have future dates such as 2099. | Skill lists (P4, **PR #6**); milestones (P3) | P3, P4 | Remove case-insensitive duplicates; reject future dates |
 
-## Open questions
+## Product decisions
 
-- Should paused or completed projects accept applications? A completed project accepted one in testing, and the contract does not forbid it.
-- Should roles marked "reviewing" accept applications? They currently do not.
+- Should paused or completed projects accept applications? Current contracts and service logic allow this while the need remains open; changing it requires a product/contract decision.
+- Only needs marked `open` accept applications. `reviewing`, `filled` and `closed` reject them, consistent with the current contract. A change needs a separate agreed task.
 
 ## Not covered
 
