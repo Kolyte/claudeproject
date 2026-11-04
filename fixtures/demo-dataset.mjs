@@ -17,10 +17,13 @@ export const DEMO_NAMESPACE = '6e5f0a3c-9b1d-5c7e-8f24-0d3a1b2c4e5f';
 export const FICTIONAL_NOTE = 'Fictional demo project for North East Origins. Not a real organisation; no traction is claimed.';
 const DAY = 86_400_000;
 
-/** RFC 4122 version-5 UUID (SHA-1, name-based). */
-export function demoUuid(name) {
+/**
+ * RFC 4122 version-5 UUID (SHA-1, name-based). `scope` is empty for the real demo seed;
+ * disposable test runs pass their own scope so they never collide with seeded demo rows.
+ */
+export function demoUuid(name, scope = '') {
   const ns = Buffer.from(DEMO_NAMESPACE.replace(/-/g, ''), 'hex');
-  const hash = createHash('sha1').update(ns).update(`neo-demo:${name}`).digest();
+  const hash = createHash('sha1').update(ns).update(`neo-demo:${scope ? `${scope}:` : ''}${name}`).digest();
   hash[6] = (hash[6] & 0x0f) | 0x50;
   hash[8] = (hash[8] & 0x3f) | 0x80;
   const h = hash.subarray(0, 16).toString('hex');
@@ -82,8 +85,10 @@ export function adaptFrontendProject(p, now) {
 /**
  * Builds all rows. `founder`, `contributor`, `unrelated` are `{ id, displayName }` for the
  * prepared, confirmed Supabase Auth accounts. `now` (ms) fixes relative dates for tests.
+ * `idScope` isolates disposable test runs; leave it unset for the real demo seed.
  */
-export function buildDemoDataset({ founder, contributor, unrelated, now = Date.now() }) {
+export function buildDemoDataset({ founder, contributor, unrelated, now = Date.now(), idScope = '' }) {
+  const demoId = (name) => demoUuid(name, idScope);
   const iso = (daysAgo) => new Date(now - daysAgo * DAY).toISOString();
   const sources = [...legacyFrontendProjects.map((p) => adaptFrontendProject(p, now)), ...LEGACY_PROJECTS];
 
@@ -107,7 +112,7 @@ export function buildDemoDataset({ founder, contributor, unrelated, now = Date.n
   );
 
   for (const src of sources) {
-    const projectId = demoUuid(`project:${src.key}`);
+    const projectId = demoId(`project:${src.key}`);
     const createdAt = iso(src.createdDaysAgo);
     rows.projects.push({
       id: projectId,
@@ -127,7 +132,7 @@ export function buildDemoDataset({ founder, contributor, unrelated, now = Date.n
     });
     for (const n of src.needs) {
       rows.project_needs.push({
-        id: demoUuid(`need:${src.key}:${n.key}`),
+        id: demoId(`need:${src.key}:${n.key}`),
         project_id: projectId,
         title: n.title,
         description: n.description,
@@ -144,7 +149,7 @@ export function buildDemoDataset({ founder, contributor, unrelated, now = Date.n
     }
     for (const post of src.posts) {
       rows.project_posts.push({
-        id: demoUuid(`post:${src.key}:${post.key}`),
+        id: demoId(`post:${src.key}:${post.key}`),
         project_id: projectId,
         author_id: founder.id,
         type: post.type,
@@ -154,7 +159,7 @@ export function buildDemoDataset({ founder, contributor, unrelated, now = Date.n
     }
     for (const m of src.milestones) {
       rows.milestones.push({
-        id: demoUuid(`milestone:${src.key}:${m.key}`),
+        id: demoId(`milestone:${src.key}:${m.key}`),
         project_id: projectId,
         title: m.title,
         description: m.description,
