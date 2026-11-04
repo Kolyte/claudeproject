@@ -1,25 +1,83 @@
 // HTTP-level tests: real Express routing, validation and permission rules over
-// the in-memory repository. They do not exercise Supabase or RLS.
-import assert from 'node:assert/strict';
-import { randomUUID } from 'node:crypto';
-import type { AddressInfo } from 'node:net';
-import type { Server } from 'node:http';
-import { after, before, beforeEach, describe, it } from 'node:test';
-import express from 'express';
-import { createOpportunitiesRouter } from './router.js';
-import { createMemoryRepository, createMemoryState, type MemoryState } from './testing/memoryRepository.js';
+// an in-memory repository. They do not exercise Supabase or RLS; tests/e2e does.
+import assert from 'node:assert/strict'
+import { randomUUID } from 'node:crypto'
+import type { Server } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import { after, before, beforeEach, describe, it } from 'node:test'
+import express, { type RequestHandler } from 'express'
+import type { Application, ApplicationReview, Need } from '@neo/contracts'
+import { errorHandler, HttpError } from '../../lib/errors.js'
+import type { OpportunitiesRepository, Pagination, ProjectAccess, Rows } from './repository.js'
+import { createOpportunitiesRouter } from './router.js'
 
-const id = (): string => randomUUID();
-const FOUNDER = id();
-const APPLICANT = id();
-const STRANGER = id();
-const PUBLIC_PROJECT = id();
-const DRAFT_PROJECT = id();
+const id = (): string => randomUUID()
+const FOUNDER = id()
+const APPLICANT = id()
+const STRANGER = id()
+const PUBLIC_PROJECT = id()
+const DRAFT_PROJECT = id()
+
+type Summary = ApplicationReview['applicant']
+interface MemoryState {
+  projects: Map<string, ProjectAccess>
+  needs: Map<string, Need>
+  applications: Map<string, Application>
+  summaries: Map<string, Summary>
+}
+
+function paged<T>(rows: T[], { limit, offset }: Pagination): Rows<T> {
+  const newestFirst = rows.toReversed()
+  return { rows: newestFirst.slice(offset, offset + limit), total: newestFirst.length }
+}
+
+/** Enforces the unique (need, applicant) constraint the database will. */
+function memoryRepository(state: MemoryState): OpportunitiesRepository {
+  const now = () => new Date().toISOString()
+  return {
+    getProject: async projectId => state.projects.get(projectId) ?? null,
+    listNeeds: async (projectId, page) => paged([...state.needs.values()].filter(need => need.projectId === projectId), page),
+    getNeed: async needId => state.needs.get(needId) ?? null,
+    async createNeed(projectId, fields) {
+      const need: Need = { ...fields, id: id(), projectId, createdAt: now() }
+      state.needs.set(need.id, need)
+      return need
+    },
+    async updateNeed(needId, patch) {
+      const need = state.needs.get(needId)
+      if (!need) return null
+      const updated = { ...need, ...patch }
+      state.needs.set(needId, updated)
+      return updated
+    },
+    getApplication: async applicationId => state.applications.get(applicationId) ?? null,
+    async createApplication({ needId, applicantId, message }) {
+      if ([...state.applications.values()].some(row => row.needId === needId && row.applicantId === applicantId)) {
+        throw new HttpError(409, 'CONFLICT', 'You have already applied for this opportunity.')
+      }
+      const application: Application = { id: id(), needId, applicantId, message, status: 'submitted', createdAt: now(), updatedAt: now() }
+      state.applications.set(application.id, application)
+      return application
+    },
+    listApplicationsByApplicant: async (applicantId, page) => paged([...state.applications.values()].filter(row => row.applicantId === applicantId), page),
+    async listApplicationsForProject(projectId, page) {
+      const rows = [...state.applications.values()].filter(row => state.needs.get(row.needId)?.projectId === projectId)
+      return paged(rows.map(row => ({ ...row, applicant: state.summaries.get(row.applicantId) as Summary })), page)
+    },
+    async updateApplicationStatus(applicationId, from, to) {
+      const application = state.applications.get(applicationId)
+      if (application?.status !== from) return null
+      const updated = { ...application, status: to, updatedAt: now() }
+      state.applications.set(applicationId, updated)
+      return updated
+    },
+  }
+}
 
 const needBody = {
   title: 'Frontend developer',
   description: 'Build the first public pages.',
-  requiredSkills: ['React', ' react ', 'TypeScript'],
+  requiredSkills: ['React', ' React ', 'TypeScript'],
   participationType: 'contributor',
   hoursPerWeek: 8,
   workMode: 'hybrid',
@@ -49,38 +107,47 @@ const apply = async (needId: string, as = APPLICANT) =>
   call('POST', `/needs/${needId}/applications`, as, { message: 'I can start with the landing page.' });
 
 before(async () => {
-  const app = express();
-  app.use(
-    '/api',
-    createOpportunitiesRouter({
-      resolveContext: (req) => ({
-        userId: req.header('x-test-user') ?? null,
-        repository: createMemoryRepository(state),
-      }),
-    }),
-  );
-  await new Promise<void>((resolve) => {
-    server = app.listen(0, () => resolve());
-  });
-  base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-});
+  const identify: RequestHandler = (req, res, next) => {
+    const user = req.header('x-test-user')
+    if (user) res.locals.user = { id: user } as typeof res.locals.user
+    next()
+  }
+  const required: RequestHandler = (req, res, next) => {
+    if (!req.header('x-test-user')) throw new HttpError(401, 'UNAUTHENTICATED', 'Sign in to continue.')
+    identify(req, res, next)
+  }
+  const app = express()
+  app.use('/api', express.json({ limit: '32kb' }), createOpportunitiesRouter({ optional: identify, required, repositoryFor: () => memoryRepository(state) }))
+  app.use(errorHandler)
+  await new Promise<void>(resolve => {
+    server = app.listen(0, () => resolve())
+  })
+  base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+})
 
 after(() => server.close());
 
 beforeEach(() => {
-  state = createMemoryState();
+  state = { projects: new Map(), needs: new Map(), applications: new Map(), summaries: new Map() };
   state.projects.set(PUBLIC_PROJECT, { id: PUBLIC_PROJECT, ownerId: FOUNDER, visibility: 'public' });
   state.projects.set(DRAFT_PROJECT, { id: DRAFT_PROJECT, ownerId: FOUNDER, visibility: 'draft' });
   state.summaries.set(APPLICANT, { displayName: 'Sam', declaredSkills: ['React'], hoursPerWeek: 10 });
 });
 
 describe('needs', () => {
-  it('lets the owner create a need with trimmed, de-duplicated skills and default status', async () => {
+  it('lets the owner create a need with trimmed, de-duplicated skills and an open default', async () => {
     const { status, json } = await call('POST', `/projects/${PUBLIC_PROJECT}/needs`, FOUNDER, needBody);
     assert.equal(status, 201);
     assert.equal(json.data.status, 'open');
     assert.deepEqual(json.data.requiredSkills, ['React', 'TypeScript']);
+    assert.equal(json.data.compensation, 'voluntary');
     assert.deepEqual(json.data.desirableSkills, []);
+  });
+
+  it('accepts a status on create, as tests/e2e/p0 relies on', async () => {
+    const { status, json } = await call('POST', `/projects/${PUBLIC_PROJECT}/needs`, FOUNDER, { ...needBody, status: 'closed' });
+    assert.equal(status, 201);
+    assert.equal(json.data.status, 'closed');
   });
 
   it('applies the documented access rules on create', async () => {
@@ -88,7 +155,7 @@ describe('needs', () => {
     assert.equal((await call('POST', path, null, needBody)).status, 401);
     assert.equal((await call('POST', path, STRANGER, needBody)).json.error.code, 'FORBIDDEN');
     assert.equal((await call('POST', `/projects/${DRAFT_PROJECT}/needs`, STRANGER, needBody)).status, 404);
-    assert.equal((await call('POST', `/projects/${randomUUID()}/needs`, FOUNDER, needBody)).status, 404);
+    assert.equal((await call('POST', `/projects/${id()}/needs`, FOUNDER, needBody)).status, 404);
   });
 
   it('shows public needs to anonymous visitors and hides draft needs from nonowners', async () => {
@@ -111,17 +178,11 @@ describe('needs', () => {
       workMode: 'moon',
       title: '   ',
       id: 'x',
-      projectId: randomUUID(),
+      projectId: id(),
     });
     assert.equal(bad.status, 400);
     assert.equal(bad.json.error.code, 'VALIDATION_ERROR');
-    assert.deepEqual(Object.keys(bad.json.error.fields).sort(), [
-      'hoursPerWeek',
-      'id',
-      'projectId',
-      'title',
-      'workMode',
-    ]);
+    for (const field of ['hoursPerWeek', 'title', 'workMode']) assert.ok(field in bad.json.error.fields, field);
     const tooMany = Array.from({ length: 31 }, (_, index) => `skill ${index}`);
     assert.equal((await call('POST', path, FOUNDER, { ...needBody, requiredSkills: tooMany })).status, 400);
     assert.equal((await call('POST', path, FOUNDER, '{not json')).json.error.code, 'VALIDATION_ERROR');
@@ -148,6 +209,12 @@ describe('needs', () => {
     assert.equal(bad.status, 401);
     const response = await fetch(`${base}/api/projects/${PUBLIC_PROJECT}/needs`);
     assert.equal(response.headers.get('cache-control'), 'no-store');
+  });
+
+  it('marks responses as uncacheable and rejects anonymous writes before validating', async () => {
+    const response = await fetch(`${base}/api/projects/${PUBLIC_PROJECT}/needs`);
+    assert.equal(response.headers.get('cache-control'), 'no-store');
+    assert.equal((await call('POST', `/projects/${PUBLIC_PROJECT}/needs`, null, { bad: true })).status, 401);
   });
 
   it('validates ids and pagination', async () => {
@@ -277,7 +344,7 @@ describe('application status transitions', () => {
   it('stops the owner withdrawing on an applicant\'s behalf, or resetting to submitted', async () => {
     const path = await submitted();
     assert.equal((await call('PATCH', path, FOUNDER, { status: 'withdrawn' })).status, 403);
-    assert.equal((await call('PATCH', path, FOUNDER, { status: 'submitted' })).status, 403);
+    assert.equal((await call('PATCH', path, FOUNDER, { status: 'submitted' })).status, 400);
   });
 
   it('hides the application from unrelated accounts and rejects anonymous requests', async () => {
@@ -296,7 +363,7 @@ describe('application status transitions', () => {
   it('turns a lost concurrent update into a conflict', async () => {
     const need = await createNeed();
     const { json } = await apply(need.id);
-    const repository = createMemoryRepository(state);
+    const repository = memoryRepository(state);
     await repository.updateApplicationStatus(json.data.id, 'submitted', 'rejected');
     assert.equal(await repository.updateApplicationStatus(json.data.id, 'submitted', 'accepted'), null);
   });

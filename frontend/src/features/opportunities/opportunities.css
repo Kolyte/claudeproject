@@ -1,25 +1,19 @@
 /* Opportunities feature. All selectors use the op- prefix; shared .btn, .card,
-   .badge, .skill, .need and .field styles come from the app's global sheet. */
+   .chip, .skill, .need, .field and .neo-* styles come from the app's global sheets. */
 .op-needs { display: flex; flex-direction: column; gap: 4px; }
-.op-section-head { display: flex; justify-content: space-between; align-items: center; gap: 8px 12px; flex-wrap: wrap; margin-bottom: 4px; }
-.op-section-head h3 { margin: 0; }
-.op-need-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-.op-need-head > .badge { flex-shrink: 0; }
-.op-prose { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.op-need-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px 12px; flex-wrap: wrap; }
+.op-need-head h2, .op-need-head h3 { margin: 0; overflow-wrap: anywhere; }
+.op-need-head > .badge, .op-need-head > .chip { flex-shrink: 0; }
+.op-status { text-transform: capitalize; }
 .op-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .op-self-start { align-self: flex-start; }
-.op-stack { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
-.op-state { padding: 8px 0; align-items: flex-start; }
-
-.op-form { display: flex; flex-direction: column; gap: 12px; }
-.op-form textarea { min-height: 88px; resize: vertical; }
+.op-stack { display: flex; flex-direction: column; gap: 10px; }
+.op-stack > p { margin: 0; }
 .op-form-row { display: flex; gap: 12px; flex-wrap: wrap; }
-.op-form input:invalid:focus, .op-form textarea:invalid:focus { outline-color: var(--accent, #d9822b); }
-.op-field-error { color: #b5523b; font-weight: 500; font-size: 0.8rem; }
-.op-error { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; background: #fde8e4; color: #8f3d2a; border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; }
-.op-inline-select { display: inline-flex; align-items: center; gap: 6px; color: var(--muted, #667085); font-weight: 600; }
-.op-inline-select select { padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border, #e4e0d6); font: inherit; font-weight: 400; background: var(--surface, #fff); }
-
+.op-field-error { color: #a63d2d; font-weight: 500; font-size: 0.8rem; }
+.op-inline-select { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 600; }
+.op-inline-select select { padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); font: inherit; font-weight: 400; background: var(--surface); }
 .op-page { max-width: 760px; display: flex; flex-direction: column; gap: 14px; }
 .op-page .page-title { margin: 0; }
+.op-page .op-need-head p { margin: 0; }
 .op-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }

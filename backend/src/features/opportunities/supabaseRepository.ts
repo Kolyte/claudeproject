@@ -1,221 +1,86 @@
-import { conflict, forbidden, internal, unauthenticated, unavailable } from './errors.js';
-import type { OpportunitiesRepository, ProjectAccess } from './repository.js';
-import type {
-  Application,
-  ApplicationReview,
-  ApplicationStatus,
-  Need,
-  NeedFields,
-  Pagination,
-  Rows,
-} from './types.js';
-import type { NeedPatch } from './validation.js';
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Application, ApplicationReview, Need } from '@neo/contracts'
+import { HttpError } from '../../lib/errors.js'
+import { databaseError } from '../../lib/supabase.js'
+import { camel, snake } from '../../lib/validation.js'
+import type { NeedPatch, OpportunitiesRepository, Pagination } from './repository.js'
 
-/** P1's restricted function: returns the allowlisted applicant subset to the owning founder. */
-export const REVIEW_SUMMARY_FUNCTION = 'application_review_summary';
+/** Selected explicitly, so a new private column can never leak into a response. */
+const NEED_COLUMNS = 'id, project_id, title, description, required_skills, desirable_skills, participation_type, hours_per_week, work_mode, location, compensation, status, created_at'
+const APPLICATION_COLUMNS = 'id, need_id, applicant_id, message, status, created_at, updated_at'
 
-const NEED_COLUMNS =
-  'id, project_id, title, description, required_skills, desirable_skills, participation_type, hours_per_week, work_mode, location, compensation, status, created_at';
-const APPLICATION_COLUMNS = 'id, need_id, applicant_id, message, status, created_at, updated_at';
+type Row = Record<string, unknown>
+interface Result<T> { data: T; error: { code?: string } | null }
 
-interface DbError {
-  code?: string;
-  message?: string;
+function unwrap<T>({ data, error }: Result<T>): T {
+  if (error) databaseError(error)
+  return data
 }
 
-interface DbResult<T> {
-  data: T;
-  error: DbError | null;
-  count?: number | null;
-}
+const range = ({ limit, offset }: Pagination): [number, number] => [offset, offset + limit - 1]
 
-/**
- * The fragment of supabase-js used here. Results are untyped until P1 ships
- * generated database types; `rowToNeed` and friends are the mapping boundary.
- */
-export interface SupabaseLike {
-  from(table: string): any;
-  rpc(fn: string, args: Record<string, unknown>): PromiseLike<DbResult<any>>;
-}
-
-type Row = Record<string, any>;
-
-function fail(error: DbError): never {
-  switch (error.code) {
-    case '23505':
-      throw conflict('You have already applied for this role.');
-    case '42501':
-      throw forbidden();
-    case 'PGRST301':
-    case 'PGRST303':
-      throw unauthenticated();
-  }
-  // supabase-js reports network failures without a Postgres or PostgREST code.
-  throw error.code ? internal() : unavailable();
-}
-
-function unwrap<T>({ data, error }: DbResult<T>): T {
-  if (error) fail(error);
-  return data;
-}
-
-function rowToNeed(row: Row): Need {
+export function createSupabaseRepository(db: SupabaseClient): OpportunitiesRepository {
   return {
-    id: row.id,
-    projectId: row.project_id,
-    title: row.title,
-    description: row.description,
-    requiredSkills: row.required_skills ?? [],
-    desirableSkills: row.desirable_skills ?? [],
-    participationType: row.participation_type,
-    hoursPerWeek: row.hours_per_week,
-    workMode: row.work_mode,
-    location: row.location,
-    compensation: row.compensation,
-    status: row.status,
-    createdAt: row.created_at,
-  };
-}
-
-function rowToApplication(row: Row): Application {
-  return {
-    id: row.id,
-    needId: row.need_id,
-    applicantId: row.applicant_id,
-    message: row.message,
-    status: row.status,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
-
-function needColumns(fields: Partial<NeedFields> & { status?: Need['status'] }): Row {
-  const columns: Row = {
-    title: fields.title,
-    description: fields.description,
-    required_skills: fields.requiredSkills,
-    desirable_skills: fields.desirableSkills,
-    participation_type: fields.participationType,
-    hours_per_week: fields.hoursPerWeek,
-    work_mode: fields.workMode,
-    location: fields.location,
-    compensation: fields.compensation,
-    status: fields.status,
-  };
-  return Object.fromEntries(Object.entries(columns).filter(([, value]) => value !== undefined));
-}
-
-const range = ({ limit, offset }: Pagination): [number, number] => [offset, offset + limit - 1];
-
-export function createSupabaseRepository(db: SupabaseLike): OpportunitiesRepository {
-  return {
-    async getProject(projectId): Promise<ProjectAccess | null> {
-      const row: Row | null = unwrap(
-        await db.from('projects').select('id, owner_id, visibility').eq('id', projectId).maybeSingle(),
-      );
-      return row && { id: row.id, ownerId: row.owner_id, visibility: row.visibility };
+    async getProject(projectId) {
+      const row = unwrap(await db.from('projects').select('id, owner_id, visibility').eq('id', projectId).maybeSingle())
+      return row && { id: row.id, ownerId: row.owner_id, visibility: row.visibility }
     },
 
-    async listNeeds(projectId, page): Promise<Rows<Need>> {
-      const result = await db
-        .from('project_needs')
-        .select(NEED_COLUMNS, { count: 'exact' })
-        .eq('project_id', projectId)
-        .order('created_at', { ascending: false })
-        .order('id', { ascending: true })
-        .range(...range(page));
-      return { rows: (unwrap(result) as Row[]).map(rowToNeed), total: result.count ?? 0 };
+    async listNeeds(projectId, page) {
+      const result = await db.from('project_needs').select(NEED_COLUMNS, { count: 'exact' }).eq('project_id', projectId)
+        .order('created_at', { ascending: false }).order('id').range(...range(page))
+      return { rows: unwrap<Row[] | null>(result)?.map(row => camel<Need>(row)) ?? [], total: result.count ?? 0 }
     },
 
     async getNeed(needId) {
-      const row: Row | null = unwrap(
-        await db.from('project_needs').select(NEED_COLUMNS).eq('id', needId).maybeSingle(),
-      );
-      return row && rowToNeed(row);
+      const row = unwrap<Row | null>(await db.from('project_needs').select(NEED_COLUMNS).eq('id', needId).maybeSingle())
+      return row && camel<Need>(row)
     },
 
     async createNeed(projectId, fields) {
-      const row: Row = unwrap(
-        await db
-          .from('project_needs')
-          .insert({ ...needColumns(fields), project_id: projectId })
-          .select(NEED_COLUMNS)
-          .single(),
-      );
-      return rowToNeed(row);
+      const row = unwrap<Row | null>(await db.from('project_needs').insert({ ...snake({ ...fields }), project_id: projectId }).select(NEED_COLUMNS).single())
+      return camel<Need>(row as Row)
     },
 
     async updateNeed(needId, patch: NeedPatch) {
-      const row: Row | null = unwrap(
-        await db
-          .from('project_needs')
-          .update(needColumns(patch))
-          .eq('id', needId)
-          .select(NEED_COLUMNS)
-          .maybeSingle(),
-      );
-      return row && rowToNeed(row);
+      const row = unwrap<Row | null>(await db.from('project_needs').update(snake({ ...patch })).eq('id', needId).select(NEED_COLUMNS).maybeSingle())
+      return row && camel<Need>(row)
     },
 
     async getApplication(applicationId) {
-      const row: Row | null = unwrap(
-        await db.from('applications').select(APPLICATION_COLUMNS).eq('id', applicationId).maybeSingle(),
-      );
-      return row && rowToApplication(row);
+      const row = unwrap<Row | null>(await db.from('applications').select(APPLICATION_COLUMNS).eq('id', applicationId).maybeSingle())
+      return row && camel<Application>(row)
     },
 
     async createApplication({ needId, applicantId, message }) {
-      const result = await db
-        .from('applications')
-        .insert({ need_id: needId, applicant_id: applicantId, message })
-        .select(APPLICATION_COLUMNS)
-        .single();
-      // P1's guard raises this when the need closes between our check and the insert.
-      if (result.error?.code === '23514') throw conflict('This role is not accepting applications.');
-      return rowToApplication(unwrap(result) as Row);
+      const result = await db.from('applications').insert({ need_id: needId, applicant_id: applicantId, message }).select(APPLICATION_COLUMNS).single()
+      if (result.error?.code === '23505') throw new HttpError(409, 'CONFLICT', 'You have already applied for this opportunity.')
+      // P1's guard raises this if the need closes between our check and the insert.
+      if (result.error?.code === '23514') throw new HttpError(409, 'CONFLICT', 'This opportunity is no longer open.')
+      return camel<Application>(unwrap<Row | null>(result) as Row)
     },
 
-    async listApplicationsByApplicant(applicantId, page): Promise<Rows<Application>> {
-      const result = await db
-        .from('applications')
-        .select(APPLICATION_COLUMNS, { count: 'exact' })
-        .eq('applicant_id', applicantId)
-        .order('created_at', { ascending: false })
-        .order('id', { ascending: true })
-        .range(...range(page));
-      return { rows: (unwrap(result) as Row[]).map(rowToApplication), total: result.count ?? 0 };
+    async listApplicationsByApplicant(applicantId, page) {
+      const result = await db.from('applications').select(APPLICATION_COLUMNS, { count: 'exact' }).eq('applicant_id', applicantId)
+        .order('created_at', { ascending: false }).order('id').range(...range(page))
+      return { rows: unwrap<Row[] | null>(result)?.map(row => camel<Application>(row)) ?? [], total: result.count ?? 0 }
     },
 
-    async listApplicationsForProject(projectId, page): Promise<Rows<ApplicationReview>> {
-      const result = await db
-        .from('applications')
-        .select(`${APPLICATION_COLUMNS}, need:project_needs!inner(project_id)`, { count: 'exact' })
-        .eq('need.project_id', projectId)
-        .order('created_at', { ascending: false })
-        .order('id', { ascending: true })
-        .range(...range(page));
+    async listApplicationsForProject(projectId, page) {
+      const result = await db.from('applications').select(`${APPLICATION_COLUMNS}, project_needs!inner(project_id)`, { count: 'exact' })
+        .eq('project_needs.project_id', projectId).order('created_at', { ascending: false }).order('id').range(...range(page))
       // Applicant details come only from P1's restricted function, never the
-      // profiles table, which is not readable by project owners.
-      const rows = await Promise.all(
-        (unwrap(result) as Row[]).map(async (row) => ({
-          ...rowToApplication(row),
-          applicant: unwrap(await db.rpc(REVIEW_SUMMARY_FUNCTION, { application_id: row.id })) as ApplicationReview['applicant'],
-        })),
-      );
-      return { rows, total: result.count ?? 0 };
+      // profiles table, which project owners cannot read.
+      const rows = await Promise.all((unwrap<Row[] | null>(result) ?? []).map(async ({ project_needs: _need, ...row }) => {
+        const applicant = unwrap<ApplicationReview['applicant'] | null>(await db.rpc('application_review_summary', { application_id: row.id }))
+        return { ...camel<Application>(row), applicant: applicant as ApplicationReview['applicant'] }
+      }))
+      return { rows, total: result.count ?? 0 }
     },
 
-    async updateApplicationStatus(applicationId, from: ApplicationStatus, to: ApplicationStatus) {
-      const row: Row | null = unwrap(
-        await db
-          .from('applications')
-          .update({ status: to })
-          .eq('id', applicationId)
-          .eq('status', from)
-          .select(APPLICATION_COLUMNS)
-          .maybeSingle(),
-      );
-      return row && rowToApplication(row);
+    async updateApplicationStatus(applicationId, from, to) {
+      const row = unwrap<Row | null>(await db.from('applications').update({ status: to }).eq('id', applicationId).eq('status', from).select(APPLICATION_COLUMNS).maybeSingle())
+      return row && camel<Application>(row)
     },
-  };
+  }
 }

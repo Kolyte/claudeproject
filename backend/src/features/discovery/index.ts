@@ -11,6 +11,8 @@
 import { Router } from 'express';
 import { handleDiscoverProjects } from './handler.ts';
 import type { PublicDb } from './service.ts';
+import { createDb } from '../../lib/supabase.js';
+import type { Env } from '../../env.js';
 
 export interface DiscoveryDeps {
   getPublicDb: () => PublicDb;
@@ -27,3 +29,11 @@ export function createDiscoveryRouter(deps: DiscoveryDeps): Router {
 
 export { handleDiscoverProjects } from './handler.ts';
 export type { PublicDb } from './service.ts';
+
+/** P1 integration: anonymous, caller-independent discovery client; RLS stays active. */
+export const router = Router();
+router.get('/discover/projects', async (req, res) => {
+  const db = createDb(req.app.locals.env as Env) as unknown as PublicDb;
+  const result = await handleDiscoverProjects(req.query as Record<string, unknown>, db);
+  res.set('Cache-Control', 'no-store').status(result.status).json(result.body);
+});
