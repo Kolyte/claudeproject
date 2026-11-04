@@ -73,13 +73,7 @@ export function createMemoryRepository(state: MemoryState): OpportunitiesReposit
       return application;
     },
     async listApplicationsByApplicant(applicantId, page) {
-      const rows = [...state.applications.values()]
-        .filter((row) => row.applicantId === applicantId)
-        .map((row) => {
-          const need = state.needs.get(row.needId);
-          return { ...row, need: need ? { id: need.id, title: need.title, projectId: need.projectId } : null };
-        });
-      return paged(rows, page);
+      return paged([...state.applications.values()].filter((row) => row.applicantId === applicantId), page);
     },
     async listApplicationsForProject(projectId, page) {
       const rows: ApplicationReview[] = [...state.applications.values()]

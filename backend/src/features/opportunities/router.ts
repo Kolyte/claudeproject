@@ -1,5 +1,5 @@
 import express, { type NextFunction, type Request, type RequestHandler, type Response, Router } from 'express';
-import { ApiFailure, internal, invalid, unavailable } from './errors.js';
+import { ApiFailure, internal, invalid, unauthenticated, unavailable } from './errors.js';
 import type { OpportunitiesRepository } from './repository.js';
 import { createOpportunitiesService, type OpportunitiesService } from './service.js';
 import { createSupabaseRepository, type SupabaseLike } from './supabaseRepository.js';
@@ -21,16 +21,24 @@ export interface RequestContext {
 export type ResolveContext = (req: Request, res: Response) => RequestContext;
 
 /**
- * The single integration point with P1's middleware. It expects
- * `res.locals.userId` (string or null) and `res.locals.db` (a per-request
- * Supabase client carrying the caller's token, or the public client).
+ * Reads what P1's auth middleware leaves on `res.locals`: the verified `user`
+ * (absent for anonymous requests) and `db`, the caller-scoped Supabase client.
  * Without a client it fails closed with 503.
  */
 export const resolveFromLocals: ResolveContext = (_req, res) => {
   const db = res.locals.db as SupabaseLike | undefined;
   if (!db) throw unavailable();
-  return { userId: (res.locals.userId as string | null | undefined) ?? null, repository: createSupabaseRepository(db) };
+  const user = res.locals.user as { id: string } | undefined;
+  return { userId: user?.id ?? null, repository: createSupabaseRepository(db) };
 };
+
+export interface RouterOptions {
+  /** Runs first on every route: P1's `optionalAuth` in the application. */
+  authenticate?: RequestHandler;
+  resolveContext?: ResolveContext;
+}
+
+const passThrough: RequestHandler = (_req, _res, next) => next();
 
 function sendError(res: Response, error: unknown): void {
   const failure = error instanceof ApiFailure ? error : internal();
@@ -65,14 +73,21 @@ type Handler = (
   userId: string | null,
 ) => Promise<Handled>;
 
-export function createOpportunitiesRouter(resolveContext: ResolveContext = resolveFromLocals): Router {
+export function createOpportunitiesRouter({
+  authenticate = passThrough,
+  resolveContext = resolveFromLocals,
+}: RouterOptions = {}): Router {
   const router = Router();
 
   const handle =
-    (handler: Handler): RequestHandler =>
+    (handler: Handler, { signedIn = false } = {}): RequestHandler =>
     async (req, res) => {
+      // Responses can hold private data, so nothing here may be cached.
+      res.set('Cache-Control', 'no-store');
       try {
         const { userId, repository } = resolveContext(req, res);
+        // Signed-out callers get 401 before any validation detail.
+        if (signedIn && !userId) throw unauthenticated();
         const { status = 200, body } = await handler(req, createOpportunitiesService(repository), userId);
         res.status(status).json(body);
       } catch (error) {
@@ -82,6 +97,7 @@ export function createOpportunitiesRouter(resolveContext: ResolveContext = resol
 
   router.get(
     '/projects/:projectId/needs',
+    authenticate,
     handle(async (req, service, userId) => ({
       body: await service.listNeeds(
         parseId(req.params.projectId, 'projectId'),
@@ -93,6 +109,7 @@ export function createOpportunitiesRouter(resolveContext: ResolveContext = resol
 
   router.post(
     '/projects/:projectId/needs',
+    authenticate,
     jsonBody,
     handle(async (req, service, userId) => ({
       status: 201,
@@ -103,21 +120,23 @@ export function createOpportunitiesRouter(resolveContext: ResolveContext = resol
           userId,
         ),
       },
-    })),
+    }), { signedIn: true }),
   );
 
   router.patch(
     '/needs/:needId',
+    authenticate,
     jsonBody,
     handle(async (req, service, userId) => ({
       body: {
         data: await service.updateNeed(parseId(req.params.needId, 'needId'), parseNeedPatch(req.body), userId),
       },
-    })),
+    }), { signedIn: true }),
   );
 
   router.post(
     '/needs/:needId/applications',
+    authenticate,
     jsonBody,
     handle(async (req, service, userId) => ({
       status: 201,
@@ -128,29 +147,32 @@ export function createOpportunitiesRouter(resolveContext: ResolveContext = resol
           userId,
         ),
       },
-    })),
+    }), { signedIn: true }),
   );
 
   router.get(
     '/me/applications',
+    authenticate,
     handle(async (req, service, userId) => ({
       body: await service.listMyApplications(parsePagination(req.query), userId),
-    })),
+    }), { signedIn: true }),
   );
 
   router.get(
     '/projects/:projectId/applications',
+    authenticate,
     handle(async (req, service, userId) => ({
       body: await service.listProjectApplications(
         parseId(req.params.projectId, 'projectId'),
         parsePagination(req.query),
         userId,
       ),
-    })),
+    }), { signedIn: true }),
   );
 
   router.patch(
     '/applications/:applicationId',
+    authenticate,
     jsonBody,
     handle(async (req, service, userId) => ({
       body: {
@@ -160,7 +182,7 @@ export function createOpportunitiesRouter(resolveContext: ResolveContext = resol
           userId,
         ),
       },
-    })),
+    }), { signedIn: true }),
   );
 
   return router;

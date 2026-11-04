@@ -52,10 +52,12 @@ before(async () => {
   const app = express();
   app.use(
     '/api',
-    createOpportunitiesRouter((req) => ({
-      userId: req.header('x-test-user') ?? null,
-      repository: createMemoryRepository(state),
-    })),
+    createOpportunitiesRouter({
+      resolveContext: (req) => ({
+        userId: req.header('x-test-user') ?? null,
+        repository: createMemoryRepository(state),
+      }),
+    }),
   );
   await new Promise<void>((resolve) => {
     server = app.listen(0, () => resolve());
@@ -140,6 +142,14 @@ describe('needs', () => {
     assert.equal(closed.json.data.projectId, PUBLIC_PROJECT);
   });
 
+  it('answers 401 before validating a signed-out request, and disables caching', async () => {
+    const need = await createNeed();
+    const bad = await call('POST', `/needs/${need.id}/applications`, null, { nonsense: true });
+    assert.equal(bad.status, 401);
+    const response = await fetch(`${base}/api/projects/${PUBLIC_PROJECT}/needs`);
+    assert.equal(response.headers.get('cache-control'), 'no-store');
+  });
+
   it('validates ids and pagination', async () => {
     assert.equal((await call('GET', '/projects/not-a-uuid/needs', null)).status, 400);
     for (const query of ['limit=0', 'limit=51', 'limit=abc', 'limit=1.5', 'offset=-1', 'limit=1&limit=2']) {
@@ -195,7 +205,7 @@ describe('applications', () => {
     await call('PATCH', `/needs/${need.id}`, FOUNDER, { status: 'closed' });
     const list = await call('GET', '/me/applications', APPLICANT);
     assert.equal(list.json.data.length, 1);
-    assert.equal(list.json.data[0].need.title, needBody.title);
+    assert.equal(list.json.data[0].needId, need.id);
   });
 
   it('shows applicants only their own submissions', async () => {

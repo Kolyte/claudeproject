@@ -5,19 +5,26 @@ Implements the P4 routes in `docs/CONTRACTS.md`: needs, applications and founder
 | File | Purpose |
 |---|---|
 | `index.ts` | Exports `router` for P1 to mount below `/api` |
-| `router.ts` | HTTP layer and the one P1 integration point, `resolveFromLocals` |
+| `router.ts` | HTTP layer; `resolveFromLocals` reads P1's request context |
 | `validation.ts` | Strict allowlists and contract limits |
 | `service.ts` | Ownership, visibility and status rules |
 | `supabaseRepository.ts` | All database access, as the calling user |
 | `testing/memoryRepository.ts` | Test double; not for application use |
 
-## What P1 needs to provide
+## Integration with P1 (PR #3)
 
-1. Add `express` and `@supabase/supabase-js` to the backend. Exclude `*.test.ts` and `testing/` from the production build.
-2. Before this router, set `res.locals.userId` (string or null) and `res.locals.db` (a per-request Supabase client carrying the caller's token, or the public client). Without `db` every route returns 503. If P1's middleware uses other names, change only `resolveFromLocals`.
-3. Provide `project_needs`, `applications`, their RLS, and `application_review_summaries(p_project_id uuid)` returning `applicant_id, display_name, declared_skills, hours_per_week`. The function name is the constant `REVIEW_SUMMARY_FUNCTION`.
-4. Approve the additive `need: { id, title, projectId } | null` on `GET /me/applications`, so applicants can see which role they applied for.
-5. Publish `@neo/contracts`; both local `types.ts` files can then be replaced.
+Built against the interfaces in `docs/P1-HANDOFF.md`, which arrive with PR #3:
+
+- `index.ts` imports `optionalAuth` from `middleware/auth.js`, so `backend/` compiles only once that lands. Every route reads `res.locals.user` and `res.locals.db`.
+- Applicant summaries use `application_review_summary(application_id uuid)`.
+- Status rules are also enforced by P1's `guard_application` trigger and RLS.
+
+When PR #3 lands:
+
+1. Keep this folder's files in place of PR #3's single-file `features/opportunities/index.ts`, and delete its `frontend/src/features/opportunities/index.tsx`. `index.ts` would otherwise shadow it silently.
+2. Point the frontend `api.ts` `request` at P1's `api()` client, or call `configureOpportunitiesAuth` at startup.
+3. Replace both local `types.ts` files with `import type` from `@neo/contracts`.
+4. Add this folder to the backend `test` script, and exclude `testing/` from the production build.
 
 ## Run the tests
 

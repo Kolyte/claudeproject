@@ -4,7 +4,6 @@ import type {
   Application,
   ApplicationReview,
   ApplicationStatus,
-  ApplicationWithNeed,
   Need,
   NeedFields,
   Pagination,
@@ -12,8 +11,8 @@ import type {
 } from './types.js';
 import type { NeedPatch } from './validation.js';
 
-/** Must match the restricted SQL function P1 ships (see README.md). */
-export const REVIEW_SUMMARY_FUNCTION = 'application_review_summaries';
+/** P1's restricted function: returns the allowlisted applicant subset to the owning founder. */
+export const REVIEW_SUMMARY_FUNCTION = 'application_review_summary';
 
 const NEED_COLUMNS =
   'id, project_id, title, description, required_skills, desirable_skills, participation_type, hours_per_week, work_mode, location, compensation, status, created_at';
@@ -166,29 +165,25 @@ export function createSupabaseRepository(db: SupabaseLike): OpportunitiesReposit
     },
 
     async createApplication({ needId, applicantId, message }) {
-      const row: Row = unwrap(
-        await db
-          .from('applications')
-          .insert({ need_id: needId, applicant_id: applicantId, message })
-          .select(APPLICATION_COLUMNS)
-          .single(),
-      );
-      return rowToApplication(row);
-    },
-
-    async listApplicationsByApplicant(applicantId, page): Promise<Rows<ApplicationWithNeed>> {
       const result = await db
         .from('applications')
-        .select(`${APPLICATION_COLUMNS}, need:project_needs(id, title, project_id)`, { count: 'exact' })
+        .insert({ need_id: needId, applicant_id: applicantId, message })
+        .select(APPLICATION_COLUMNS)
+        .single();
+      // P1's guard raises this when the need closes between our check and the insert.
+      if (result.error?.code === '23514') throw conflict('This role is not accepting applications.');
+      return rowToApplication(unwrap(result) as Row);
+    },
+
+    async listApplicationsByApplicant(applicantId, page): Promise<Rows<Application>> {
+      const result = await db
+        .from('applications')
+        .select(APPLICATION_COLUMNS, { count: 'exact' })
         .eq('applicant_id', applicantId)
         .order('created_at', { ascending: false })
         .order('id', { ascending: true })
         .range(...range(page));
-      const rows = (unwrap(result) as Row[]).map((row) => ({
-        ...rowToApplication(row),
-        need: row.need ? { id: row.need.id, title: row.need.title, projectId: row.need.project_id } : null,
-      }));
-      return { rows, total: result.count ?? 0 };
+      return { rows: (unwrap(result) as Row[]).map(rowToApplication), total: result.count ?? 0 };
     },
 
     async listApplicationsForProject(projectId, page): Promise<Rows<ApplicationReview>> {
@@ -199,36 +194,22 @@ export function createSupabaseRepository(db: SupabaseLike): OpportunitiesReposit
         .order('created_at', { ascending: false })
         .order('id', { ascending: true })
         .range(...range(page));
-      const rows = unwrap(result) as Row[];
-
       // Applicant details come only from P1's restricted function, never the
       // profiles table, which is not readable by project owners.
-      const summaries = unwrap(
-        await db.rpc(REVIEW_SUMMARY_FUNCTION, { p_project_id: projectId }),
-      ) as Row[];
-      const byApplicant = new Map(summaries.map((summary) => [summary.applicant_id, summary]));
-
-      return {
-        rows: rows.map((row) => {
-          const summary = byApplicant.get(row.applicant_id);
-          return {
-            ...rowToApplication(row),
-            applicant: {
-              displayName: summary?.display_name ?? 'Unknown applicant',
-              declaredSkills: summary?.declared_skills ?? [],
-              hoursPerWeek: summary?.hours_per_week ?? null,
-            },
-          };
-        }),
-        total: result.count ?? 0,
-      };
+      const rows = await Promise.all(
+        (unwrap(result) as Row[]).map(async (row) => ({
+          ...rowToApplication(row),
+          applicant: unwrap(await db.rpc(REVIEW_SUMMARY_FUNCTION, { application_id: row.id })) as ApplicationReview['applicant'],
+        })),
+      );
+      return { rows, total: result.count ?? 0 };
     },
 
     async updateApplicationStatus(applicationId, from: ApplicationStatus, to: ApplicationStatus) {
       const row: Row | null = unwrap(
         await db
           .from('applications')
-          .update({ status: to, updated_at: new Date().toISOString() })
+          .update({ status: to })
           .eq('id', applicationId)
           .eq('status', from)
           .select(APPLICATION_COLUMNS)

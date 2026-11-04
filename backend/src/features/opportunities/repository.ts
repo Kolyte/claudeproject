@@ -2,7 +2,6 @@ import type {
   Application,
   ApplicationReview,
   ApplicationStatus,
-  ApplicationWithNeed,
   Need,
   NeedFields,
   Pagination,
@@ -32,7 +31,7 @@ export interface OpportunitiesRepository {
   getApplication(applicationId: string): Promise<Application | null>;
   /** Throws a CONFLICT ApiFailure when the applicant already applied to the need. */
   createApplication(input: { needId: string; applicantId: string; message: string }): Promise<Application>;
-  listApplicationsByApplicant(applicantId: string, page: Pagination): Promise<Rows<ApplicationWithNeed>>;
+  listApplicationsByApplicant(applicantId: string, page: Pagination): Promise<Rows<Application>>;
   listApplicationsForProject(projectId: string, page: Pagination): Promise<Rows<ApplicationReview>>;
   /** Compare-and-swap on status. Returns null if the row is no longer in `from`. */
   updateApplicationStatus(

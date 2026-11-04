@@ -49,16 +49,7 @@ export default function MyApplicationsPage() {
           {items.map((application) => (
             <li key={application.id} className="card pad op-stack">
               <div className="op-need-head">
-                <div>
-                  {application.need ? (
-                    <Link className="need-title" to={`/projects/${application.need.projectId}`}>
-                      {application.need.title}
-                    </Link>
-                  ) : (
-                    <span className="need-title">Role no longer available</span>
-                  )}
-                  <div className="small muted">Applied {formatDate(application.createdAt)}</div>
-                </div>
+                <div className="need-title">Applied {formatDate(application.createdAt)}</div>
                 <span className={`badge ${applicationBadge[application.status]}`}>
                   {applicationStatusLabels[application.status]}
                 </span>

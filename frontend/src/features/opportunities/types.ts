@@ -36,10 +36,6 @@ export interface Application {
   updatedAt: string;
 }
 
-export interface ApplicationWithNeed extends Application {
-  need: { id: string; title: string; projectId: string } | null;
-}
-
 export type ApplicationReview = Application & {
   applicant: { displayName: string; declaredSkills: string[]; hoursPerWeek: number | null };
 };

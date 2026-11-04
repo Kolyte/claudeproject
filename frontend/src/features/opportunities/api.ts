@@ -2,7 +2,6 @@ import type {
   Application,
   ApplicationReview,
   ApplicationStatus,
-  ApplicationWithNeed,
   Need,
   NeedFields,
   NeedStatus,
@@ -89,7 +88,7 @@ export const applyToNeed = (needId: string, message: string) =>
   }).then(unwrap);
 
 export const listMyApplications = (offset: number, limit = PAGE_SIZE) =>
-  request<Page<ApplicationWithNeed>>(`/me/applications${pageQuery(offset, limit)}`);
+  request<Page<Application>>(`/me/applications${pageQuery(offset, limit)}`);
 
 export const listProjectApplications = (projectId: string, offset: number) =>
   request<Page<ApplicationReview>>(`/projects/${encodeURIComponent(projectId)}/applications${pageQuery(offset)}`);

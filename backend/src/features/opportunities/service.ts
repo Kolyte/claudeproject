@@ -4,7 +4,6 @@ import type {
   Application,
   ApplicationReview,
   ApplicationStatus,
-  ApplicationWithNeed,
   Need,
   NeedFields,
   Page,
@@ -75,10 +74,7 @@ export function createOpportunitiesService(repo: OpportunitiesRepository) {
       return repo.createApplication({ needId, applicantId, message });
     },
 
-    async listMyApplications(
-      page: Pagination,
-      userId: string | null,
-    ): Promise<Page<ApplicationWithNeed>> {
+    async listMyApplications(page: Pagination, userId: string | null): Promise<Page<Application>> {
       return toPage(await repo.listApplicationsByApplicant(requireUser(userId), page), page);
     },
 
