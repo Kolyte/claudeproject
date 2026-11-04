@@ -38,6 +38,17 @@ test('IDs are stable UUIDs across builds', () => {
   assert.match(demoUuid('x'), /^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
 });
 
+test('test-run scope isolates IDs without changing the real demo IDs', () => {
+  const scoped = buildDemoDataset({ ...accounts, now: NOW, idScope: 'p0-abc' });
+  const real = new Set(TABLE_ORDER.filter((t) => t !== 'profiles').flatMap((t) => rows[t].map((r) => r.id)));
+  for (const t of TABLE_ORDER.filter((t) => t !== 'profiles')) {
+    for (const r of scoped[t]) assert.ok(!real.has(r.id), `${t} id collides with the real seed`);
+  }
+  assert.deepEqual(validateDataset(scoped), []);
+  // Pinned: the real seed's first project ID must never change, or reruns would duplicate data.
+  assert.equal(rows.projects[0].id, demoUuid('project:frontend:quaywatch'));
+});
+
 test('validator catches contract violations', () => {
   const bad = structuredClone(rows);
   bad.milestones[0].verification = 'verified';
