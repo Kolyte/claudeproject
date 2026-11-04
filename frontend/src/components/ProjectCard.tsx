@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { Project } from '../types';
+import type { Project } from '../../types';
 import { activityLabel, lastSubstantiveUpdate, relativeDate } from '../lib/activity';
 import ActivityBadge from './ActivityBadge';
 

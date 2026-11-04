@@ -1,6 +1,6 @@
 // Clearly fictional seed data for the demo. Dates are relative to "today"
 // so activity labels stay sensible whenever you run the app.
-import type { ContributorProfile, Person, Project } from '../types';
+import type { ContributorProfile, Person, Project } from '../../types';
 
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
 

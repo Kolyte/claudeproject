@@ -1,7 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../state/ProjectsContext';
-import type { Compensation, Project, ProjectNeed, Stage, Town, WorkMode, WorkType } from '../types';
+import type { Compensation, Project, ProjectNeed, Stage, Town, WorkMode, WorkType } from '../../types';
 
 const towns: Town[] = ['Newcastle', 'Durham', 'Sunderland', 'Teesside', 'Gateshead', 'Northumberland'];
 const stages: Stage[] = ['Idea', 'Prototype', 'MVP', 'Early users'];
