@@ -1,0 +1,36 @@
+name: coordination
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: coordination-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  ownership:
+    name: coordination / ownership
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out trusted base policy and checker
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - name: Verify trusted checker
+        run: node --test scripts/coordination/check-ownership.test.mjs
+      - name: Validate candidate file ownership and report overlaps
+        run: node scripts/coordination/check-ownership.mjs --github
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
