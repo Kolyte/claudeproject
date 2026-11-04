@@ -17,6 +17,43 @@
   }
 }
 
+.neo-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 72px; padding-block: 12px; flex-wrap: wrap; }
+.neo-nav { flex-wrap: wrap; }
+.neo-nav .btn { white-space: nowrap; }
+.neo-skip { position: absolute; left: 12px; top: -100px; z-index: 20; padding: 12px; background: white; color: #1d3b53; }
+.neo-skip:focus { top: 12px; }
+.neo-auth { max-width: 640px; margin: 24px auto; }
+.neo-form { display: flex; flex-direction: column; gap: 16px; }
+.neo-form .btn { align-self: flex-start; }
+.neo-form-foot { margin-top: 20px; }
+.neo-form fieldset { border: 1px solid var(--border); border-radius: 8px; }
+.neo-check { display: inline-flex; gap: 8px; margin-right: 16px; padding-block: 6px; text-transform: capitalize; }
+.neo-feedback { margin-block: 16px; border-left: 4px solid #a63d2d; background: #fff1ec; padding: 12px 16px; overflow-wrap: anywhere; }
+.neo-feedback p { margin: 0 0 8px; }
+.neo-project-sections, .neo-section-title { margin-top: 24px; }
+.neo-project > .card { margin-block: 20px; }
+.neo-prose { white-space: pre-wrap; overflow-wrap: anywhere; }
+.neo-pager { margin-top: 20px; }
+.neo-discovery-form { margin-bottom: 24px; display: flex; flex-direction: column; gap: 16px; }
+.neo-discovery-form .filters { margin: 0; }
+.neo-project-card { display: flex; flex-direction: column; gap: 10px; overflow-wrap: anywhere; }
+.neo-project-card h2 { font-size: 1.3rem; }
+.neo-project-card p { margin: 0; }
+.neo-application-list { display: grid; gap: 16px; margin-block: 20px; }
+.neo-needs, .neo-activity { min-width: 0; }
+.neo-form input, .neo-form textarea, .neo-form select { min-width: 0; width: 100%; }
+.neo-form .neo-check input { width: auto; }
+.neo-form textarea { min-height: 110px; }
+.btn:disabled { opacity: 0.65; cursor: wait; }
+:focus-visible { outline: 3px solid #d9822b; outline-offset: 3px; }
+@media (max-width: 520px) {
+  .neo-topbar { align-items: flex-start; }
+  .neo-nav { gap: 8px; }
+  .neo-nav .nav-link { padding-inline: 0; }
+  .neo-form, .neo-form .field { min-width: 0; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
+
 .hero {
   position: relative;
 
