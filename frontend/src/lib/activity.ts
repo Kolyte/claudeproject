@@ -1,4 +1,4 @@
-import type { ActivityLabel, Project } from '../types';
+import type { ActivityLabel, Project } from '../../types';
 
 const DAY = 86_400_000;
 

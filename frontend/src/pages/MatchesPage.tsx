@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { demoContributor } from '../data/mockData';
 import { rankMatches, WEIGHTS } from '../lib/matching';
 import { useProjects } from '../state/ProjectsContext';
-import type { ContributorProfile } from '../types';
+import type { ContributorProfile } from '../../types';
 
 const dimensionLabels: Record<keyof typeof WEIGHTS, string> = {
   skills: 'Required skills',

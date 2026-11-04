@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import ActivityBadge from '../components/ActivityBadge';
 import { activityLabel, formatDate, initials, lastSubstantiveUpdate, relativeDate } from '../lib/activity';
 import { useProjects } from '../state/ProjectsContext';
-import type { PostType, ProjectNeed } from '../types';
+import type { PostType, ProjectNeed } from '../../types';
 
 const postIcon: Record<PostType, string> = {
   'Progress update': '↗',

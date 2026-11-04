@@ -1,6 +1,6 @@
 // Transparent, deterministic matching (spec section 9). No AI here: the AI's job
 // later is only to produce the structured skills list; ranking stays explainable.
-import type { ContributorProfile, Project, ProjectNeed, Town } from '../types';
+import type { ContributorProfile, Project, ProjectNeed, Town } from '../../types';
 
 export const WEIGHTS = {
   skills: 40,

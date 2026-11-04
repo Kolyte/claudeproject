@@ -2,7 +2,7 @@
 // functions with Supabase queries and keep the same interface for the pages.
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import { projects as seed } from '../data/mockData';
-import type { Project } from '../types';
+import type { Project } from '../../types';
 
 interface ProjectsState {
   projects: Project[];
