@@ -1,0 +1,44 @@
+NETWORK DESIGN KIT
+
+Open index.html in your browser for the visual design document.
+It works offline. No installation, account or build step is needed.
+Use your browser's Print / Save as PDF command for a printable copy.
+
+CONTENTS
+index.html          Visual guide and an unrelated example product
+guide.css           Presentation styles for the guide
+DESIGN-SPEC.txt     Detailed implementation brief for a designer or coding agent
+tokens.css          Portable palette, typography, spacing and motion tokens
+assets/fonts/       Self-hosted fonts and their original license notices
+
+PURPOSE
+Reuse the portfolio's visual language in a completely different project.
+Keep the ink-and-paper contrast, typography, route colours, structured cards
+and clear navigation. Replace all portfolio-specific content and behaviour.
+
+The example product, Fieldwork, is an illustrative project-planning workspace.
+It is not a commissioned product, a functional app or a required new identity.
+The design system is project-neutral because no new project brief was supplied.
+
+HOW TO REUSE
+1. Read DESIGN-SPEC.txt and decide which components fit the new product.
+2. Copy tokens.css and assets/fonts into that project's own asset structure.
+3. Import tokens.css before your application styles. Update font URLs if moved.
+4. Give the three route colours meaningful, stable categories in the new domain.
+5. Implement semantic components with keyboard access and a mobile layout.
+6. Validate actual content, contrast, focus, zoom and reduced-motion states.
+
+This folder contains no portfolio CV, photograph, personal contact details,
+analytics configuration, credentials or research documents.
+The existing website and its deployment have not been changed.
+
+PROVENANCE AND RIGHTS
+Design values were extracted from the local portfolio's DESIGN.md,
+src/styles.css, src/journey-layout.css, src/data/design.ts and
+src/components/RouteStrip.css on 4 November 2026.
+
+The neutral application example, expanded reading sizes, spacing scale and
+responsive recommendations are adaptations, not claims about exact source UI.
+Fonts are distributed with their original SIL Open Font License notices.
+No TfL logo, roundel, Johnston font or reference PDF is included.
+This is an independent transport-inspired visual system, not TfL branding.

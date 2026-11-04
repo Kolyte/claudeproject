@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Network Design Kit | Visual style and implementation guide</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to design guide</a>
+  <header class="masthead">
+    <a class="brand" href="#main"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Network Design Kit<small>VISUAL SYSTEM / EDITION 01</small></span></a>
+    <nav aria-label="Guide sections"><a href="#foundations">Foundations</a><a href="#components">Components</a><a href="#handoff">Handoff <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main id="main">
+    <section class="cover" aria-labelledby="cover-title">
+      <div class="cover-meta"><span>DESIGN LANGUAGE / PROJECT NEUTRAL</span><span>04 NOV 2026</span></div>
+      <p class="eyebrow">A visual system for a different destination</p>
+      <h1 id="cover-title">Same character.<br><span>New territory.</span></h1>
+      <div class="cover-bottom"><p>Dark ink. Warm paper. Clear connections.<br>A reusable design language, not another portfolio.</p><a class="text-link" href="#example">Explore the example <span aria-hidden="true">↓</span></a></div>
+      <div class="cover-routes" aria-hidden="true"><i></i><i></i><i></i></div>
+    </section>
+
+    <section id="example" class="example-section" aria-labelledby="example-title">
+      <div class="section-heading"><div><p class="eyebrow">01 / Visual translation</p><h2 id="example-title">A different project.<br>The same design DNA.</h2></div><p>Fieldwork is a fictional planning workspace. The example keeps the visual language and replaces the entire subject matter.</p></div>
+      <div class="product-example">
+        <div class="product-header"><span class="product-wordmark">fieldwork<span class="edition">WORKSPACE 01</span></span><div class="service-key"><span><b class="badge green">P</b> Plan</span><span><b class="badge blue">M</b> Make</span><span><b class="badge yellow">R</b> Review</span></div></div>
+        <div class="product-body">
+          <div class="diagram-pane">
+            <div class="diagram-caption">PROJECT CONNECTIONS <span>SCHEMATIC / NOT TO SCALE</span></div>
+            <svg class="project-map" viewBox="0 0 650 460" role="img" aria-labelledby="map-title map-description">
+              <title id="map-title">A project from brief to handover</title>
+              <desc id="map-description">The Plan route links Brief and Scope to Workshop. Make links Workshop to Prototype. Review links Prototype to Handover. Workshop is selected.</desc>
+              <g class="context-routes" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M-30 95H175Q195 95 210 110L420 320Q435 335 455 335H680"/><path d="M-25 395H130Q150 395 165 380L420 125Q435 110 455 110H680"/><path d="M100-20V95Q100 115 115 130L355 370Q370 385 370 405V490"/><path d="M580-20V185Q580 205 565 220L375 410Q360 425 340 425H-20"/></g>
+              <g class="map-routes" fill="none"><path class="route-green" d="M45 335H130Q145 335 155 325L300 180Q310 170 325 170H390"/><path class="route-blue" d="M390 170H450Q465 170 475 180L520 225Q530 235 530 250V345"/><path class="route-yellow" d="M530 345H370Q355 345 345 335L290 280Q280 270 265 270H55"/></g>
+              <g class="station-points"><circle cx="80" cy="335" r="6"/><circle cx="205" cy="275" r="6"/><circle cx="530" cy="250" r="6"/><circle cx="110" cy="270" r="6"/></g>
+              <g class="map-exchanges"><rect x="369" y="160" width="42" height="20" rx="10"/><rect x="509" y="335" width="42" height="20" rx="10"/></g>
+              <circle class="selected-node" cx="390" cy="170" r="5"/>
+              <g class="map-labels"><text x="80" y="364">Brief</text><text x="174" y="251">Scope</text><text x="347" y="145" class="selected-label">Workshop</text><text x="550" y="254">Build</text><text x="483" y="378">Prototype</text><text x="69" y="247">Handover</text></g>
+            </svg>
+            <p class="diagram-note">Relationships, not decoration.<br><span>Use a map only when it helps explain the product.</span></p>
+          </div>
+          <article class="ticket" aria-labelledby="ticket-title">
+            <div class="ticket-band"><span><i class="line-swatch"></i> PLAN / WORK ITEM</span><span>02 / 06</span></div>
+            <div class="ticket-content"><p class="eyebrow">Next working session</p><h3 id="ticket-title">Make room for<br>better questions.</h3><p class="ticket-summary">Bring the team together to agree what matters before the first prototype.</p><dl class="fact-list"><div><dt>Session</dt><dd>Discovery workshop</dd></div><div><dt>Duration</dt><dd>45 minutes</dd></div><div><dt>Status</dt><dd><span class="status-dot" aria-hidden="true"></span> Ready to plan</dd></div></dl><div class="tags"><span>Shared brief</span><span>Decisions</span><span>Next steps</span></div></div>
+            <a class="ticket-action" href="#components">See the component recipe <span aria-hidden="true">↗</span></a>
+          </article>
+        </div>
+        <div class="sample-navigator"><span class="eyebrow">Current location</span><strong><span class="location-dot" aria-hidden="true"></span> Workshop</strong><span class="sample-status">Selected state includes a text label</span></div>
+      </div>
+      <p class="footnote">Static visual specimen. Fieldwork is an illustrative identity, not a working app or a prescribed project brief.</p>
+    </section>
+
+    <section id="foundations" class="paper-section" aria-labelledby="foundations-title">
+      <div class="section-heading"><div><p class="eyebrow">02 / Foundations</p><h2 id="foundations-title">Ink, paper<br>and a little colour.</h2></div><p>Neutral surfaces do the heavy lifting. Three stable accents give structure and make relationships easy to follow.</p></div>
+      <div class="palette">
+        <div class="colour-tile ink-tile"><span>Canvas</span><code>#141B1D</code></div><div class="colour-tile paper-tile"><span>Paper</span><code>#EEECDF</code></div><div class="colour-tile green-tile"><span>Green</span><code>#00792C</code></div><div class="colour-tile blue-tile"><span>Blue</span><code>#0098D4</code></div><div class="colour-tile yellow-tile"><span>Yellow</span><code>#FFD300</code></div>
+      </div>
+      <div class="foundation-grid"><article><p class="eyebrow">Reading hierarchy</p><h3>Space Grotesk</h3><p class="type-display">Useful.<br>Not ordinary.</p><p>Regular-weight headings with close tracking and confident scale. Avoid heavy, oversized marketing type everywhere.</p></article><article><p class="eyebrow">Reading rhythm</p><h3 class="body-font">DM Sans</h3><p class="body-specimen">Clear language.<br>Comfortable reading.<br>Small details that belong.</p><p>Use 14-16px body text, generous line height, concise labels and visible hierarchy. Small map labels are not body-text defaults.</p><div class="type-weights"><span>Regular 400</span><span>Medium 500</span><span>Semibold 600</span></div></article></div>
+      <div class="principles"><article><span class="index-label">A</span><h3>Colour has a job.</h3><p>Choose domain-specific categories. Do not use the three route colours as an arbitrary rainbow.</p></article><article><span class="index-label">B</span><h3>Paper carries content.</h3><p>Warm panels, narrow rules, square corners and deliberate spacing. Reserve rounded geometry for the dock and nodes.</p></article><article><span class="index-label">C</span><h3>Structure stays legible.</h3><p>Horizontal labels, stable alignment and clear destinations. Text and selected shapes reinforce colour.</p></article></div>
+    </section>
+
+    <section id="components" class="components-section" aria-labelledby="components-title">
+      <div class="section-heading"><div><p class="eyebrow">03 / Component language</p><h2 id="components-title">A small vocabulary.<br>Plenty of range.</h2></div><p>Keep components useful outside a transport metaphor. These are the building blocks to carry into the next project.</p></div>
+      <div class="component-grid">
+        <article class="component-card"><div class="component-sample badges-sample"><span class="badge green">P</span><span class="badge blue">M</span><span class="badge yellow">R</span></div><div class="component-description"><span class="eyebrow">01 / Identification</span><h3>Square service badges</h3><p>19-24px visual marks paired with names. Clickable versions belong inside larger touch targets.</p></div></article>
+        <article class="component-card"><div class="component-sample rules-sample"><span>PROJECT NOTES</span><i></i><strong>A clear next step.</strong><i></i><small>Fine rule above. Perforation below.</small></div><div class="component-description"><span class="eyebrow">02 / Containment</span><h3>Ticket structure</h3><p>A 5px identity stripe, warm band, generous reading area and dashed action separator. Mostly square corners.</p></div></article>
+        <article class="component-card"><div class="component-sample action-sample"><a class="primary-action" href="#handoff">Read the handoff <span aria-hidden="true">↗</span></a><span>Purposeful action. Visible keyboard focus.</span></div><div class="component-description"><span class="eyebrow">03 / Interaction</span><h3>Quiet, direct controls</h3><p>Ink-on-paper actions and restrained links. No shifting hit areas, floating labels or motion that delays a task.</p></div></article>
+      </div>
+      <div class="rule-table"><div><span>Spacing</span><strong>4 / 8 / 12 / 16 / 24 / 32 / 48 / 64</strong><p>A practical, adapted spacing scale.</p></div><div><span>Shape</span><strong>0px cards / 2px badges / 18px dock</strong><p>Different corners for different roles.</p></div><div><span>Motion</span><strong>160ms feedback / 300ms selection</strong><p>Immediate states with reduced motion.</p></div></div>
+    </section>
+
+    <section class="paper-section adaptation-section" aria-labelledby="adaptation-title">
+      <div class="section-heading"><div><p class="eyebrow">04 / Adaptation rules</p><h2 id="adaptation-title">Borrow the language.<br>Not the whole story.</h2></div><p>A different project needs its own information architecture, identity and task flows.</p></div>
+      <div class="keep-change"><article><span class="direction-label"><span class="badge green">+</span> Keep the character</span><ul><li>Ink canvas and warm reading surfaces</li><li>Space Grotesk and DM Sans</li><li>Stable category colour and square badges</li><li>Fine rules, factual rows and clear hierarchy</li><li>Purposeful, restrained transitions</li></ul></article><article><span class="direction-label"><span class="badge yellow">↗</span> Change the context</span><ul><li>Brand, content and category meanings</li><li>Navigation to suit the actual workflow</li><li>Map only if relationships need explaining</li><li>No career content or skill passengers</li><li>No trains required to make the style work</li></ul></article></div>
+      <div class="delivery-grid"><article><p class="eyebrow">Small screens</p><h3>Reflow, do not shrink.</h3><p>Stack content below 760px. Keep readable labels and practical touch targets. Replace a cramped diagram with a list or simpler navigation.</p></article><article><p class="eyebrow">Inclusive by default</p><h3>Useful without motion.</h3><p>Keep keyboard focus visible. Pair colour with labels. Provide a text equivalent for diagrams, and preserve reading at 200% text zoom.</p></article></div>
+    </section>
+
+    <section id="handoff" class="handoff" aria-labelledby="handoff-title"><div><p class="eyebrow">05 / Ready to reuse</p><h2 id="handoff-title">Take the system.<br>Build something else.</h2><p>Everything is local, editable and independent of the portfolio. No build step. No external requests. No personal content.</p></div><div class="file-list"><a href="DESIGN-SPEC.txt"><span>01</span><div><strong>DESIGN-SPEC.txt</strong><small>Detailed design brief and coding-agent handoff</small></div><span aria-hidden="true">↗</span></a><a href="tokens.css"><span>02</span><div><strong>tokens.css</strong><small>Portable colour, type, spacing and motion</small></div><span aria-hidden="true">↗</span></a><a href="START-HERE.txt"><span>03</span><div><strong>START-HERE.txt</strong><small>Usage, provenance and font license information</small></div><span aria-hidden="true">↗</span></a></div></section>
+  </main>
+  <footer class="document-footer"><span>NETWORK DESIGN KIT / EDITION 01</span><span>Independent design system. No TfL affiliation.</span><a href="#main">Back to top ↑</a></footer>
+</body>
+</html>

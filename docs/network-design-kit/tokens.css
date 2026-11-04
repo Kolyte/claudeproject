@@ -1,0 +1,95 @@
+@font-face {
+  font-family: 'DM Sans';
+  src: url('./assets/fonts/dm-sans-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: url('./assets/fonts/dm-sans-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: url('./assets/fonts/dm-sans-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('./assets/fonts/space-grotesk-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('./assets/fonts/space-grotesk-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+:root {
+  --color-canvas: #141b1d;
+  --color-ink: #172331;
+  --color-paper: #eeecdf;
+  --color-paper-raised: #f4f1e7;
+  --color-paper-band: #dcdacc;
+  --color-text-on-dark: #ecebdf;
+  --color-muted-on-dark: #97a6a4;
+  --color-muted-on-paper: #526171;
+  --color-line-on-dark: #c6d3c51f;
+  --color-line-on-paper: #1723313d;
+  --color-route-green: #00792c;
+  --color-route-blue: #0098d4;
+  --color-route-yellow: #ffd300;
+  --color-focus-on-paper: #003888;
+  --color-focus-on-dark: #e66c57;
+  --font-body: 'DM Sans', sans-serif;
+  --font-heading: 'Space Grotesk', sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --radius-badge: 2px;
+  --radius-card: 0px;
+  --radius-dock: 18px;
+  --stroke-hairline: 1px;
+  --stroke-route: 9px;
+  --stroke-route-casing: 15px;
+  --stroke-mini-route: 4px;
+  --shadow-ticket: 8px 12px 0 #0002;
+  --shadow-dock: 0 12px 32px #0004, 0 2px 0 #ffffff40 inset;
+  --duration-feedback: 160ms;
+  --duration-selection: 300ms;
+  --duration-panel: 450ms;
+  --ease-ui: cubic-bezier(.2, .7, .2, 1);
+  --content-max: 1440px;
+  --header-height: 100px;
+  --dock-height: 144px;
+  --touch-target: 44px;
+}
+@media (max-width: 759px) {
+  :root {
+    --header-height: 76px;
+    --dock-height: 152px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-feedback: 0ms;
+    --duration-selection: 0ms;
+    --duration-panel: 0ms;
+  }
+}

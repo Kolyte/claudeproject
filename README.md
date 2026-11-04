@@ -14,6 +14,7 @@ North East Origins is a project-first collaboration platform for North East Engl
 | [ROADMAP.md](ROADMAP.md) | Five work lanes, task IDs, dependencies, three-hour checkpoints and stretch goals |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | File ownership, separate checkouts, PRs and sequential integration |
 | [Agent instructions](AGENTS.md) | Rules every coding agent must follow |
+| [Design reference](docs/DESIGN.md) | Network Design Kit, P3 handoff and deferred website redesign |
 | [Contracts](docs/CONTRACTS.md) | API, data, component and permission agreements |
 | [Setup](docs/SETUP.md) | What runs now, planned backend setup, credentials and deployment |
 | [Demo](docs/DEMO.md) | Fictional seed data, acceptance checklist and rehearsal script |
