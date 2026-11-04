@@ -35,7 +35,7 @@ node --test scripts/coordination/check-ownership.test.mjs
 node scripts/coordination/check-ownership.mjs --base origin/main
 ```
 
-The local check includes all tracked changes from the merge base plus non-ignored untracked files. Run the applicable feature tests, frontend build/lint and backend checks once they exist. Do not claim a check passed when its command is not implemented.
+The local check includes all tracked changes from the merge base plus non-ignored untracked files. Run applicable feature checks and both package builds/lints using [setup](docs/SETUP.md#local-stack-and-validation-coverage). These commands now exist. The default backend tests cover only `src/lib/`, so explicitly run opportunities, discovery/sector and fixture tests when relevant. Do not count skipped environment-dependent suites as passes or local tests as hosted acceptance.
 
 Use the PR template. Link the issue; give a concrete before/after result, interface changes and verification. Keep each PR focused and buildable. Use a draft while incomplete. CI checks PR file paths using the checker and policy from the base branch, including both paths of renames and deleted files. Overlap warnings list other open PRs to inspect; warnings are advisory snapshots and can become stale.
 
@@ -50,7 +50,7 @@ Unknown paths require P1 to register ownership in a separate policy PR first. A 
 - If a shared interface changes, P1 updates contracts first and names affected lanes in the issue. Update consumers before integrating the dependent change.
 - P5 coordinates release; humans retain responsibility for approvals, deployment and merges. Agents do not push to main, merge or deploy unless explicitly instructed by their human.
 
-The coordination package is the initial bootstrap commit, pushed before the new rules exist. After it lands, use the PR process for application work. Files alone cannot enable branch protection; the repository administrator must activate it.
+The coordination package was the initial bootstrap commit. It is integrated; use the PR process for subsequent work. Files alone cannot enable branch protection; the repository administrator must verify/activate it. The approved frontend redesign and bridge logo are part of the integration baseline: feature merges must retain them.
 
 ## Dependencies, migrations and deployment
 

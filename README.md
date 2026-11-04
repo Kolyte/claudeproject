@@ -4,7 +4,9 @@ Discover what the North East is building. Find a project worth joining, or the p
 
 North East Origins is a project-first collaboration platform for North East England. This repository contains the React frontend, Express API, Supabase migrations, shared contracts, fictional development fixtures and the coordination pack for five people building with coding agents.
 
-The P0 application is implemented and deployed at [north-east-origins.onrender.com](https://north-east-origins.onrender.com/), using hosted Supabase persistence. Current release evidence and outstanding hosted acceptance checks are tracked in [P1 issue #1](https://github.com/Kolyte/claudeproject/issues/1). GitHub enforcement still requires repository administrator settings.
+The P0 application is implemented, and the hosted preview is [north-east-origins.onrender.com](https://north-east-origins.onrender.com/), using Supabase persistence. Implementation on `main` includes the Network Design Kit redesign, bridge logo, P4 opportunities and fixed-sector discovery/project forms. The full hosted acceptance journey and rehearsal still need recorded evidence. [P1 issue #1](https://github.com/Kolyte/claudeproject/issues/1) contains the last recorded deployment commit and Auth/database checks; it does not establish that every later main commit is deployed. GitHub enforcement still requires repository administrator verification.
+
+Documentation reviewed on 4 November 2026 against the integrated source and GitHub records. Live task status belongs in issues; the roadmap's timed checkpoints are the original delivery plan, not a claim that work remains unstarted.
 
 ## Start here
 
@@ -18,6 +20,7 @@ The P0 application is implemented and deployed at [north-east-origins.onrender.c
 | [Contracts](docs/CONTRACTS.md) | API, data, component and permission agreements |
 | [Setup](docs/SETUP.md) | Local development, credentials, migrations and deployment |
 | [Demo](docs/DEMO.md) | Fictional seed data, acceptance checklist and rehearsal script |
+| [Platform handoff](docs/P1-HANDOFF.md) | Implemented integrations, remaining release work and QA evidence limits |
 
 ## Agreed stack
 
@@ -41,7 +44,7 @@ npm --prefix backend run dev
 npm --prefix frontend run dev
 ```
 
-The checked-in `backend/.env` and `frontend/.env` contain the shared hosted demo URL and publishable key, so both packages connect to the same database immediately. `.env.example` files describe the variables for another environment. See [setup](docs/SETUP.md) for local Supabase and production commands. Public pages render without Auth configuration; account routes show a setup notice until configured.
+The checked-in `backend/.env` and `frontend/.env` contain the shared hosted demo URL and publishable key, so both packages connect to the same database immediately. Local development therefore writes to the hosted demo unless you configure a local stack. Keep local overrides uncommitted. `.env.example` files describe the variables for another environment. See [setup](docs/SETUP.md) for local Supabase, feature-test commands and production commands. Public pages render without Auth configuration; account routes show a setup notice until configured.
 
 ## Check coordination
 
