@@ -132,13 +132,15 @@
   margin: 0;
   padding: 4px;
   list-style: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  /* Own colours: the page-level --text can be light-on-dark (design kit), so never inherit it. */
+  background: var(--color-paper-raised, #ffffff);
+  color: var(--color-ink, #1c2430);
+  border: 1px solid var(--color-muted-on-paper, #667085);
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(28, 36, 48, 0.12);
+  box-shadow: 0 8px 24px rgba(28, 36, 48, 0.18);
   max-height: 280px;
   overflow-y: auto;
 }
-.disc-sector-option { padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: 400; color: var(--text); font-size: 0.9rem; }
-.disc-sector-option.active { background: #eef2f6; color: var(--primary); }
+.disc-sector-option { padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: 400; color: var(--color-ink, #1c2430); background: transparent; font-size: 0.9rem; }
+.disc-sector-option.active { background: var(--color-paper-band, #eef2f6); color: var(--color-ink, #1d3b53); }
 .disc-sector-error { color: #b42318; font-size: 0.8rem; font-weight: 500; }
