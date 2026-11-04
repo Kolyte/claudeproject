@@ -5,6 +5,7 @@
 // Scale note: this reads every published project per request. That is fine for the
 // timed build and demo data (tens to hundreds of rows). If discovery grows, ask P1
 // for a SQL view/function with the same semantics and keep `applyDiscovery` as the spec.
+import { canonicalSkill } from './skills.ts';
 import type { DiscoveryFilters, DiscoveryProjectRow, Page, ProjectSummary } from './types.ts';
 
 /** Post types that count as substantive progress (announcements/opportunities do not). */
@@ -36,9 +37,11 @@ export function summariseRow(row: DiscoveryProjectRow): ProjectSummary {
   const openNeeds = (row.project_needs ?? []).filter((n) => n.status === 'open');
   const seen = new Map<string, string>();
   for (const need of openNeeds) {
-    for (const skill of need.required_skills ?? []) {
+    for (const raw of need.required_skills ?? []) {
+      // Canonical names, so "ReactJS" on a need and "React" in a search are the same skill.
+      const skill = canonicalSkill(raw);
       const key = fold(skill);
-      if (key && !seen.has(key)) seen.set(key, skill.trim());
+      if (key && !seen.has(key)) seen.set(key, skill);
     }
   }
   const updateDates = [
@@ -71,8 +74,8 @@ export function matchesFilters(summary: ProjectSummary, filters: DiscoveryFilter
   if (filters.sector && fold(summary.sector) !== fold(filters.sector)) return false;
   if (filters.stage && summary.stage !== filters.stage) return false;
   if (filters.skill) {
-    const skill = fold(filters.skill);
-    if (!summary.requiredSkills.some((s) => fold(s) === skill)) return false;
+    const skill = fold(canonicalSkill(filters.skill));
+    if (!summary.requiredSkills.some((s) => fold(canonicalSkill(s)) === skill)) return false;
   }
   return true;
 }

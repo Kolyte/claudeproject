@@ -185,6 +185,17 @@ describe('API journey and permissions', { skip, concurrency: false }, () => {
     assert.equal(ms.json.data.verification, 'self_reported');
   });
 
+  test('saved skills are canonical and de-duplicated (profile and needs)', async () => {
+    const me = await api(contributor, 'PATCH', '/me', { declaredSkills: ['reactjs', 'typescript', 'React'] });
+    expectStatus(me, 200, 'profile skills');
+    assert.deepEqual(me.json.data.declaredSkills, ['React', 'TypeScript']);
+    const need = await api(founder, 'POST', `/projects/${projectId}/needs`, {
+      ...needBody(`[E2E fictional] alias skills ${RUN}`), requiredSkills: ['ReactJS', 'react', 'postgres'], status: 'closed',
+    });
+    expectStatus(need, 201, 'need with aliased skills');
+    assert.deepEqual(need.json.data.requiredSkills, ['React', 'PostgreSQL']);
+  });
+
   test('discovery finds the published project by skill and location', async () => {
     const res = await api(null, 'GET', `/discover/projects?skill=${encodeURIComponent(SKILL.toLowerCase())}&location=newcastle`);
     expectStatus(res, 200, 'discovery filter');

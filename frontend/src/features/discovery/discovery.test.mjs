@@ -57,16 +57,19 @@ test('fixture query applies contract semantics', () => {
 
 test('sector suggestions match word prefixes, whole-name prefixes first', async () => {
   const { SECTORS, suggestSectors, canonicalSector } = await import('./sectors.ts');
-  assert.deepEqual(suggestSectors('fi'), ['Finance', 'Fintech', 'Sport & Fitness']);
-  assert.deepEqual(suggestSectors('FIN'), ['Finance', 'Fintech']);
+  assert.deepEqual(suggestSectors('fi'), ['Film & TV', 'Finance', 'FinTech', 'Sport & Fitness']);
+  assert.deepEqual(suggestSectors('FIN'), ['Finance', 'FinTech']);
   assert.deepEqual(suggestSectors('machine'), ['Machine Learning']);
-  assert.deepEqual(suggestSectors('soft'), ['Software Engineering']);
+  assert.deepEqual(suggestSectors('soft'), ['Software Development', 'Software Engineering']);
+  assert.deepEqual(suggestSectors('ai'), ['AI Development']);
+  assert.deepEqual(suggestSectors('dev'), ['Developer Tools', 'AI Development', 'Cloud & DevOps', 'Software Development', 'Web Development']);
   assert.deepEqual(suggestSectors('learn'), ['Machine Learning']);
+  assert.equal(canonicalSector('fintech'), 'FinTech', 'old spelling still matches');
   assert.deepEqual(suggestSectors('data an'), ['Data & Analytics']);
   assert.deepEqual(suggestSectors('zzz'), []);
   assert.equal(suggestSectors('').length, SECTORS.length);
   assert.equal(suggestSectors('', 5).length, 5);
-  assert.equal(canonicalSector('  fintech '), 'Fintech');
+  assert.equal(canonicalSector('  fintech '), 'FinTech');
   assert.equal(canonicalSector('Fin'), null);
   assert.equal(new Set(SECTORS.map((s) => s.toLowerCase())).size, SECTORS.length, 'no duplicates');
   assert.ok(SECTORS.every((s) => s.length <= 120));
@@ -76,4 +79,31 @@ test('frontend and backend sector lists are identical', async () => {
   const fe = await import('./sectors.ts');
   const be = await import('../../../../backend/src/features/discovery/sectors.ts');
   assert.deepEqual([...fe.SECTORS], [...be.SECTORS]);
+});
+
+test('skills: aliases map to one canonical name; unknown skills are kept', async () => {
+  const { SKILLS, SKILL_ALIASES, canonicalSkill, canonicalSkills, suggestSkills } = await import('./skills.ts');
+  for (const [raw, want] of [['reactjs', 'React'], ['React.js', 'React'], [' REACT ', 'React'], ['postgres', 'PostgreSQL'],
+    ['ts', 'TypeScript'], ['ai', 'AI/ML'], ['ML', 'AI/ML'], ['ai/ml', 'AI/ML'], ['nodejs', 'Node.js'], ['k8s', 'Kubernetes'],
+    ['Tailwind', 'Tailwind CSS'], ['UX research', 'User Research'], ['Data visualization', 'Data Visualisation']]) {
+    assert.equal(canonicalSkill(raw), want, raw);
+  }
+  assert.equal(canonicalSkill('  Quantum   Basket Weaving '), 'Quantum Basket Weaving', 'unknown skill kept, whitespace tidied');
+  assert.deepEqual(canonicalSkills(['react', 'React', 'ReactJS', 'postgres', 'Leaflet', '']), ['React', 'PostgreSQL', 'Leaflet']);
+  assert.equal(new Set(SKILLS.map((s) => s.toLowerCase())).size, SKILLS.length, 'no duplicate skills');
+  for (const target of Object.values(SKILL_ALIASES)) assert.ok(SKILLS.includes(target), `alias target ${target} is listed`);
+  assert.ok(SKILLS.every((s) => s.length <= 60), 'contract: each skill <= 60 chars');
+  assert.deepEqual(suggestSkills('post').slice(0, 1), ['PostgreSQL']);
+  assert.ok(suggestSkills('react').slice(0, 2).includes('React'));
+  assert.ok(suggestSkills('reactj').includes('React'), 'alias prefix suggests canonical');
+  assert.ok(suggestSkills('ai').includes('AI/ML'));
+  assert.ok(suggestSkills('type').includes('TypeScript'));
+  assert.ok(!suggestSkills('re', 8, ['React']).includes('React'), 'already-entered skills are excluded');
+});
+
+test('frontend and backend skill lists are identical', async () => {
+  const fe = await import('./skills.ts');
+  const be = await import('../../../../backend/src/features/discovery/skills.ts');
+  assert.deepEqual([...fe.SKILLS], [...be.SKILLS]);
+  assert.deepEqual(fe.SKILL_ALIASES, be.SKILL_ALIASES);
 });

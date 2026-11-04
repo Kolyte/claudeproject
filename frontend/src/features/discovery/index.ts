@@ -4,3 +4,5 @@ export { default as LandingPage } from './LandingPage.tsx';
 export { default as ExplorePage } from './ExplorePage.tsx';
 export { default as SectorInput } from './SectorInput.tsx';
 export { SECTORS, canonicalSector, suggestSectors, type Sector } from './sectors.ts';
+export { default as SkillInput } from './SkillInput.tsx';
+export { SKILLS, canonicalSkill, canonicalSkills, parseSkillList, suggestSkills } from './skills.ts';
