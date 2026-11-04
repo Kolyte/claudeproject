@@ -7,8 +7,8 @@ The product scope, permissions and wire contracts remain defined by `ROADMAP.md`
 - Working branch: `p1/platform-foundation`; task: GitHub issue #1.
 - The human expanded P1's task to replace the demo across the P0 feature areas. This is an explicit cross-lane implementation handoff, not a change to the five-lane ownership policy.
 - PR #2 separately registers legacy paths introduced by the incoming demo. It must be reviewed before integration; do not weaken the checker.
-- The combined replacement branch touches P2–P5 paths under that human instruction. The ordinary P1 ownership check will flag them. P5 must review the handoff and choose lane-scoped integration or obtain an explicit integration exception; a green build alone does not authorize merging.
-- New `origin/p4/opportunities` and `origin/claude/focused-keller-eybtli` (P5) branches were discovered during the last fetch. They overlap this integration branch and must be reconciled sequentially; do not merge competing implementations blindly.
+- The combined replacement touches P2–P5 paths under that human instruction. The ordinary P1 ownership check flags them. The human subsequently explicitly instructed P1 to merge this combined PR into main after consistency checks; that authorization is a one-off integration exception, not a change to future lane ownership.
+- P5's discovery work landed on main during integration and is preserved here, wired to the P1 platform. The separate `origin/p4/opportunities` branch overlaps the current opportunities module; P4 must rebase and reconcile it against the integrated base.
 
 ## Run locally
 
@@ -36,12 +36,12 @@ Production commands remain those in `docs/SETUP.md`; `render.yaml` prepares one 
 | P2 | Review the canonical project creation/edit/publication and dashboard implementation in `features/projects/`; verify draft visibility and composition of P3/P4 public exports. |
 | P3 | Review `features/activity/`; finish timeline/empty/error states and preserve self-reported milestones and canonical post types. |
 | P4 | Reconcile `p4/opportunities` with the shared middleware and review-summary function. Keep applications private and status transitions backed by the database. Do not change the wire contract to fit a local type. |
-| P5 | Reconcile the discovery/seed/test branch, exercise the documented fictional seed against the real schema, and run the full deployed acceptance checklist. Coordinate sequential integration and rehearsal. |
+| P5 | Discovery/seed/test work from main is included. Exercise the documented fictional seed against the real schema and run the full deployed acceptance checklist. Coordinate sequential integration and rehearsal. |
 
 ## Verification and limits
 
-The backend unit/API and PostgreSQL-engine checks cover validation, RLS, draft privacy, owner writes, application privacy, duplicate/closed needs, restricted summaries and terminal transitions. `tests/e2e/p0.test.mjs` exercises real local Supabase Auth/PostgREST plus two browser sessions, signup/email confirmation, discovery/application/review, refresh persistence and a 390px mobile viewport. It creates and removes isolated local test accounts; it refuses remote targets.
+The backend unit/API and PostgreSQL-engine checks cover validation, RLS, draft privacy, owner writes, application privacy, duplicate/closed needs, restricted summaries and terminal transitions. `tests/e2e/p0.test.mjs` exercises real local Supabase Auth/PostgREST plus two browser sessions, signup/email confirmation, discovery/application/review, refresh persistence and a 390px mobile viewport. It also applies P5's documented fictional seed twice against the real local schema. It creates and removes isolated local test accounts; it refuses remote targets.
 
 To run that end-to-end test, provide ignored `.env.test` with local `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEO_API_URL`, `NEO_UI_URL` and `NEO_MAILPIT_URL`, then run `node --env-file=.env.test --test tests/e2e/p0.test.mjs`. The local administrative key is used only by test-account setup/cleanup, never by application requests. The browser test currently uses installed Microsoft Edge through Playwright.
 
-Hosted provider behavior, a public deployment URL, the P5 fixture seed, and the final team rehearsal remain separate acceptance gates. Passing local checks does not mark the hosted P0 release complete.
+Hosted provider behavior, a public deployment URL, the hosted fictional seed, and the final team rehearsal remain separate acceptance gates. Passing local checks does not mark the hosted P0 release complete.

@@ -3,6 +3,8 @@ import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { randomUUID } from 'node:crypto'
 import { mkdir } from 'node:fs/promises'
+import { buildDemoDataset } from '../../fixtures/demo-dataset.mjs'
+import { seed, supabaseRest } from '../../scripts/seed-demo.mjs'
 const require = createRequire(new URL('../../backend/package.json', import.meta.url))
 const { createClient } = require('@supabase/supabase-js')
 const { chromium } = require('@playwright/test')
@@ -73,6 +75,16 @@ test('real local Supabase: signup/confirmation, founder and contributor P0 journ
     const founder = await account('Founder')
     const contributor = await account('Contributor')
     const third = await account('Unrelated')
+    await t.test('documented fictional seed runs against the real schema and is repeatable', async () => {
+      const prepared = { founder: { id: founder.id, displayName: 'Founder' }, contributor: { id: contributor.id, displayName: 'Contributor' }, unrelated: { id: third.id, displayName: 'Unrelated' } }
+      const rows = buildDemoDataset(prepared)
+      const options = { db: supabaseRest({ url, key: serviceKey }), rows, accounts: prepared, skipProfiles: false, log: () => {} }
+      await seed(options)
+      await seed(options)
+      const count = await admin.from('projects').select('id', { count: 'exact' }).eq('owner_id', founder.id)
+      assert.ifError(count.error)
+      assert.equal(count.count, rows.projects.length)
+    })
     const draft = (await request('/projects', { token: founder.token, method: 'POST', expected: 201, body: { title, pitch: 'Open river sensors', problem: 'Flooding', solution: 'Community sensor network', sector: 'Climate', location: 'Newcastle', stage: 'prototype' } })).data
     await t.test('draft privacy, validated publishing and public response', async () => {
       await request(`/projects/${draft.id}`, { expected: 404 })
@@ -118,7 +130,7 @@ test('real local Supabase: signup/confirmation, founder and contributor P0 journ
       await login(contributorPage, contributor, '/explore')
       await contributorPage.getByLabel('Search', { exact: true }).fill(run)
       await expect(contributorPage).toHaveURL(new RegExp(`q=${run}`))
-      await contributorPage.getByLabel('Location', { exact: true }).selectOption('Newcastle')
+      await contributorPage.getByRole('combobox', { name: 'Location', exact: true }).selectOption('Newcastle')
       await contributorPage.getByLabel('Skill needed', { exact: true }).fill('React')
       await expect(contributorPage).toHaveURL(/skill=React/)
       await contributorPage.locator('.disc-card').filter({ hasText: title }).click()

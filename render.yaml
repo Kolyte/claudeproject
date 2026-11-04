@@ -11,6 +11,8 @@ services:
         value: 24
       - key: NODE_ENV
         value: production
+      - key: NPM_CONFIG_INCLUDE
+        value: dev
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_PUBLISHABLE_KEY

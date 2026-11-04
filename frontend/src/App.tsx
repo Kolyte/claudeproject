@@ -3,7 +3,7 @@ import { BrowserRouter, Link, NavLink, Outlet, Route, Routes } from 'react-route
 import { AuthProvider, LoginPage, SignupPage, ProfilePage, RequireAuth, useAuth } from './features/auth'
 import { ProjectPage, NewProjectPage, EditProjectPage, MyProjectsPage } from './features/projects'
 import { MyApplicationsPage, ReviewApplicationsPage } from './features/opportunities'
-import { LandingPage, ExplorePage } from './features/discovery'
+import { LandingPage, ExplorePage } from './features/discovery/index.ts'
 import { Feedback, SetupNotice } from './components/ui/Feedback'
 import { supabase } from './lib/supabase'
 import { message } from './lib/api'

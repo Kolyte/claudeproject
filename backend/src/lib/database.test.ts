@@ -32,7 +32,7 @@ test('P0 database: owner → publication → application → private review', as
       grant usage on schema public, auth to anon, authenticated;
       grant execute on function auth.uid() to anon, authenticated;
     `)
-    for (const migration of ['202611040001_p0_foundation.sql', '202611040002_discovery.sql']) {
+    for (const migration of ['202611040001_p0_foundation.sql', '202611040002_discovery.sql', '202611040003_seed_record_guards.sql']) {
       await db.exec(await readFile(new URL(`../../../supabase/migrations/${migration}`, import.meta.url), 'utf8'))
     }
     for (const userId of [owner, applicant, unrelated]) {

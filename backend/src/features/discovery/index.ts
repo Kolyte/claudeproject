@@ -33,6 +33,7 @@ export type { PublicDb } from './service.ts';
 /** P1 integration: anonymous, caller-independent discovery client; RLS stays active. */
 export const router = Router();
 router.get('/discover/projects', async (req, res) => {
-  const result = await handleDiscoverProjects(req.query as Record<string, unknown>, createDb(req.app.locals.env as Env));
+  const db = createDb(req.app.locals.env as Env) as unknown as PublicDb;
+  const result = await handleDiscoverProjects(req.query as Record<string, unknown>, db);
   res.set('Cache-Control', 'no-store').status(result.status).json(result.body);
 });
