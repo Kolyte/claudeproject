@@ -6,7 +6,7 @@ Reviewed on 4 November 2026. ROADMAP.md defines scope, CONTRACTS.md defines inte
 
 Platform/contracts/Auth/profile and the combined P0 application landed through PRs #2–#5; public environment configuration through #11/#12. [P4 PR #6](https://github.com/Kolyte/claudeproject/pull/6) is merged: its repository uses caller-scoped clients and application_review_summary(application_id uuid), resolving the former adapter-name conflict.
 
-The approved Network Design Kit redesign and palette-matched SVG bridge are on main. Preserve the current presentation. [PR #13](https://github.com/Kolyte/claudeproject/pull/13) adds fixed-sector discovery and [PR #14](https://github.com/Kolyte/claudeproject/pull/14) adds sector selection and validation to project writes. Older unlisted sectors remain stored until edited.
+The approved Network Design Kit redesign and palette-matched SVG bridge are on main. Preserve the current presentation. [PR #13](https://github.com/Kolyte/claudeproject/pull/13) adds fixed-sector discovery and [PR #14](https://github.com/Kolyte/claudeproject/pull/14) adds sector selection and validation to project writes. Older unlisted sectors remain stored until edited. [PR #15](https://github.com/Kolyte/claudeproject/pull/15) fixes discovery-card wrapping and heading order within the existing design.
 
 App.tsx and backend routes.ts wire all P0 features. Legacy pages, the memory provider and matching/activity helpers are retained source material, disconnected from the active app. There is no automatic fixture fallback or live matching/following route.
 
@@ -40,7 +40,7 @@ Local tests, hosted database assertions and public/Auth smoke are separate evide
 
 [PR #10](https://github.com/Kolyte/claudeproject/pull/10) reports 18 historical findings against 8e4e59c, before the redesign. Reproduce on current main before treating a finding as a current failure. Orange-button contrast and unloaded-Inter observations refer to superseded styling; the current app has different colours and self-hosted fonts. Source changes alone do not constitute a fresh accessibility audit.
 
-Current source still has no role title in Application, opportunities ordered newest-first before pagination, an hours input using valueAsNumber, and h3 discovery-card headings. Recheck those alongside the report's auth/error, long-text, touch-target and validation cases. Only open needs accept applications; paused/completed project status does not itself close a need.
+Current source still has no role title in Application, opportunities ordered newest-first before pagination and an hours input using valueAsNumber. PR #15 fixes the discovery portion of long-text overflow and uses h2 card titles on Explore while retaining h3 under the landing section's h2; its recorded expanded local browser suite passed 8/8. P2/P4 long-text cases remain separate. Recheck the report's other auth/error, touch-target and validation cases. Only open needs accept applications; paused/completed project status does not itself close a need.
 
 Default backend tests/platform CI omit feature-folder tests. Run discovery (including sector tests), fixtures and opportunities explicitly. Historical bundle-size/Fast Refresh warnings are not failing tests.
 

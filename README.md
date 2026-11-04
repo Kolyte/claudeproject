@@ -21,6 +21,7 @@ Documentation reviewed on 4 November 2026 against the integrated source and GitH
 | [Setup](docs/SETUP.md) | Local development, credentials, migrations and deployment |
 | [Demo](docs/DEMO.md) | Fictional seed data, acceptance checklist and rehearsal script |
 | [Platform handoff](docs/P1-HANDOFF.md) | Implemented integrations, remaining release work and QA evidence limits |
+| [Historical QA report](ERRORS.md) | Original audit findings, superseded assumptions and merged discovery fixes |
 
 ## Agreed stack
 
