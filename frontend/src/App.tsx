@@ -4,8 +4,7 @@ import { AuthProvider, LoginPage, SignupPage, ProfilePage, RequireAuth, useAuth 
 import { ProjectPage, NewProjectPage, EditProjectPage, MyProjectsPage } from './features/projects'
 import { MyApplicationsPage, ReviewApplicationsPage } from './features/opportunities'
 import { LandingPage, ExplorePage } from './features/discovery/index.ts'
-import { Feedback, SetupNotice } from './components/ui/Feedback'
-import { supabase } from './lib/supabase'
+import { Feedback } from './components/ui/Feedback'
 import { message } from './lib/api'
 import './App.css'
 
@@ -32,7 +31,6 @@ function AppRoutes() {
   const { session } = useAuth()
   return <Routes key={session?.user.id ?? 'public'}><Route element={<Shell />}>
     <Route path="/login" element={<LoginPage />} /><Route path="/signup" element={<SignupPage />} />
-    <Route element={supabase ? <Outlet /> : <SetupNotice />}>
       <Route index element={<LandingPage />} /><Route path="/explore" element={<ExplorePage />} />
       <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
       <Route path="/projects/new" element={<RequireAuth><NewProjectPage /></RequireAuth>} />
@@ -41,7 +39,6 @@ function AppRoutes() {
       <Route path="/dashboard/projects" element={<RequireAuth><MyProjectsPage /></RequireAuth>} />
       <Route path="/dashboard/applications" element={<RequireAuth><MyApplicationsPage /></RequireAuth>} />
       <Route path="/projects/:projectId/applications" element={<RequireAuth><ReviewApplicationsPage /></RequireAuth>} />
-    </Route>
     <Route path="*" element={<section><h1>Page not found</h1><Link to="/">Return home</Link></section>} />
   </Route></Routes>
 }
