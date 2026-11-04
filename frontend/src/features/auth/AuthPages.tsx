@@ -11,6 +11,7 @@ export function SignupPage() { return <AuthPage signup /> }
 function AuthPage({ signup }: { signup: boolean }) {
   const { session, loading } = useAuth()
   const [params] = useSearchParams()
+  const investorSignup = signup && params.get('plan') === 'investor'
   const requested = params.get('next') ?? '/profile'
   const hasUnsafeCharacter = [...requested].some(character => character === '\\' || character.charCodeAt(0) < 32)
   const destination = /^\/(?!\/)/.test(requested) && !hasUnsafeCharacter && !/^\/(login|signup)(\?|$)/.test(requested) ? requested : '/profile'
@@ -38,6 +39,7 @@ function AuthPage({ signup }: { signup: boolean }) {
   return <section className="neo-auth card pad">
     <h1>{signup ? 'Join North East Origins' : 'Welcome back'}</h1>
     <p className="muted">Find a project worth joining, or the people who can help build yours.</p>
+    {investorSignup && <p className="neo-investor-signup">Investor plan: <strong>£5.99 GBP per month.</strong> Billing is not available yet. This creates a standard account without taking payment or activating a paid subscription. <Link to="/pricing">View plan details</Link>.</p>}
     {confirmation ? <p role="status">Check your email to confirm your account, then sign in here.</p> : <form onSubmit={submit} className="neo-form">
       <Field label="Email"><input type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} /></Field>
       <Field label="Password"><input type="password" autoComplete={signup ? 'new-password' : 'current-password'} minLength={signup ? 8 : undefined} required value={password} onChange={event => setPassword(event.target.value)} /></Field>
