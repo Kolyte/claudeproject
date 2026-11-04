@@ -10,6 +10,25 @@ Prepare a confirmed founder, contributor and unrelated test account. The founder
 
 The seed must upsert only the dedicated tagged demo records, validate its account IDs and avoid deleting any unrelated data. Prepare the visible timeline, at least one open need and one already closed need. All milestones say “Founder reported” or “Self-reported.”
 
+### Seeding (P5-02)
+
+The dataset lives in `fixtures/demo-dataset.mjs`. It adapts the current `frontend/src/data/mockData.ts` projects and the preserved TyneFlow AI / Vanguard fixtures (`fixtures/legacy-projects.mjs`) to the contract schema. IDs are deterministic UUIDs in a fixed demo namespace; that namespace is the "tag". Every project's problem text ends with a fictional-project notice.
+
+```sh
+node scripts/seed-demo.mjs --dry-run      # validates against the contract; no network, no env
+node --test fixtures/demo-dataset.test.mjs
+```
+
+After P1 has applied the P0 migrations, seed locally with the prepared accounts' Auth user IDs:
+
+```sh
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
+DEMO_FOUNDER_ID=<uuid> DEMO_CONTRIBUTOR_ID=<uuid> DEMO_UNRELATED_ID=<uuid> \
+DEMO_FOUNDER_NAME="Demo Founder" node scripts/seed-demo.mjs --apply
+```
+
+The script verifies the three accounts exist, refuses to run if a demo ID already belongs to another owner or project, upserts profiles → projects → needs → posts → milestones, and never deletes. `--skip-profiles` leaves the accounts' profile rows untouched. Column names follow the contract's snake_case mapping; if P1's migration differs, the script stops with the PostgREST error.
+
 ## Three-minute core script
 
 | Time | Action | Proof |
@@ -37,6 +56,29 @@ Use two browser profiles/sessions to avoid role switching confusion. A demo scri
 - No source text, example data or UI implies verified commercial traction or guaranteed equity.
 
 P5 implements browser journey tests in `tests/e2e/` and records reproducible steps for permission checks. Do not attach JWTs, passwords, service keys or private profile responses to public issues.
+
+### Running the automated checks (P5-03)
+
+Both suites use Node's built-in test runner and skip, with the reason, when their environment is missing. The browser suite needs the `playwright` package (a P1 dependency request; it falls back to a globally installed copy).
+
+```sh
+node --test backend/src/features/discovery/discovery.test.ts frontend/src/features/discovery/discovery.test.mjs
+```
+
+```sh
+E2E_BASE_URL=https://<deployment> node --test tests/e2e/discovery.browser.test.mjs
+```
+
+```sh
+E2E_BASE_URL=https://<deployment> SUPABASE_URL=... SUPABASE_PUBLISHABLE_KEY=... \
+E2E_FOUNDER_EMAIL=... E2E_FOUNDER_PASSWORD=... E2E_CONTRIBUTOR_EMAIL=... E2E_CONTRIBUTOR_PASSWORD=... \
+E2E_UNRELATED_EMAIL=... E2E_UNRELATED_PASSWORD=... node --test tests/e2e/permissions.api.test.mjs
+```
+
+- `discovery.browser.test.mjs` covers landing → explore hand-off, skill and location filters synced to the URL, deep-link refresh, no-results and retryable network-error states, and a 375px mobile viewport with no horizontal overflow.
+- `permissions.api.test.mjs` covers the acceptance list above at API level as anonymous, founder, contributor and unrelated users. That includes drafts, edits, needs/posts/milestones, discovery, applications, duplicates, closed needs, the review-summary shape and status transitions. It leaves records titled `[E2E fictional] …` behind. Direct RLS checks with the publishable key and the review-summary function are still manual steps for P1 and P5.
+
+For development before the API exists, `VITE_DISCOVERY_SOURCE=fixtures npm --prefix frontend run dev` makes discovery read the fictional fixture behind a visible "fictional fixture data" banner. Never use it for the demo.
 
 ## Release record
 

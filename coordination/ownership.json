@@ -13,6 +13,7 @@
         "frontend/package.json", "frontend/package-lock.json", "frontend/index.html", "frontend/.env.example",
         "frontend/vite.config.ts", "frontend/tsconfig.json", "frontend/tsconfig.app.json", "frontend/tsconfig.node.json",
         "frontend/src/App.tsx", "frontend/src/App.css", "frontend/src/main.tsx", "frontend/src/index.css", "frontend/src/vite-env.d.ts",
+        "frontend/src/components/Layout.tsx", "frontend/src/state/ProjectsContext.tsx", "frontend/src/types.ts", "frontend/types.ts",
         "backend/package.json", "backend/package-lock.json", "backend/tsconfig.json", "backend/.env.example",
         "backend/src/index.ts", "backend/src/app.ts", "backend/src/routes.ts", "backend/src/env.ts"
       ],
@@ -25,13 +26,13 @@
     "p2": {
       "name": "Projects",
       "branchPrefix": "p2/",
-      "files": [],
+      "files": ["frontend/src/pages/NewProjectPage.tsx", "frontend/src/pages/ProjectPage.tsx"],
       "prefixes": ["frontend/src/features/projects/", "backend/src/features/projects/"]
     },
     "p3": {
       "name": "Progress",
       "branchPrefix": "p3/",
-      "files": [],
+      "files": ["frontend/src/components/ActivityBadge.tsx"],
       "prefixes": ["frontend/src/features/activity/", "backend/src/features/activity/"]
     },
     "p4": {
@@ -43,7 +44,7 @@
     "p5": {
       "name": "Discovery and integration",
       "branchPrefix": "p5/",
-      "files": ["docs/DEMO.md", "scripts/seed-demo.mjs"],
+      "files": ["docs/DEMO.md", "scripts/seed-demo.mjs", "frontend/src/components/ProjectCard.tsx", "frontend/src/pages/ExplorePage.tsx", "frontend/src/pages/MatchesPage.tsx"],
       "prefixes": ["frontend/src/features/discovery/", "backend/src/features/discovery/", "frontend/src/data/", "fixtures/", "tests/e2e/"]
     }
   }
