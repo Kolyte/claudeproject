@@ -140,3 +140,7 @@ button:disabled { cursor: not-allowed; }
   .brand { font-size: 1.05rem; } .project-header { gap: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* Bridge mark uses paper steelwork, a yellow sun and the blue river accent. */
+.brand-logo { display: block; width: 76px; height: 48px; object-fit: contain; flex-shrink: 0; }
+@media (max-width: 759px) { .brand-logo { width: 64px; height: 40px; } }
