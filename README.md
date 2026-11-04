@@ -55,3 +55,7 @@ node scripts/coordination/check-ownership.mjs --base origin/main --branch p1/you
 Replace the example branch with your assigned `p1/`–`p5/` branch. The local check includes committed changes, tracked working changes and untracked, non-ignored files since the merge base. CI validates PR files against the policy already on the base branch.
 
 The three-hour target is a live founder → project → opportunity → contributor application → founder review journey. P0 must pass before stretch features enter the demo.
+
+## Contact
+
+dylanleonardleedsuk@gmail.com
