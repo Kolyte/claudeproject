@@ -89,13 +89,15 @@
 .disc-count { min-height: 1.3em; margin: 4px 0 12px; }
 
 /* Card */
-.disc-card { display: flex; flex-direction: column; text-decoration: none; color: inherit; overflow: hidden; }
+.disc-grid { grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
+.disc-card { display: flex; flex-direction: column; min-width: 0; text-decoration: none; color: inherit; overflow: hidden; }
 .disc-card:hover { border-color: var(--primary); }
 .disc-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .disc-card-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.disc-card-title { font-size: 1.1rem; margin: 4px 0 0; }
+.disc-card-title { font-size: 1.1rem; margin: 4px 0 0; overflow-wrap: anywhere; }
 .disc-card-pitch { margin: 0; overflow-wrap: anywhere; }
-.disc-card-meta { margin: 0; }
+.disc-card-meta { margin: 0; overflow-wrap: anywhere; }
+.disc-card .chip, .disc-card .need-pill { overflow-wrap: anywhere; max-width: 100%; }
 .disc-card-needs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .disc-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-right: 2px; }
 .disc-card-foot { border-top: 1px solid var(--border); padding: 10px 16px; }
