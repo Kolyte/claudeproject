@@ -1,25 +1,38 @@
-import { Router } from 'express'
-import { z } from 'zod'
-import type { Env } from '../../env.js'
-import { optionalAuth } from '../../middleware/auth.js'
-import { camel, parse, shortText, stage } from '../../lib/validation.js'
-import { databaseError } from '../../lib/supabase.js'
-import type { ProjectSummary } from '@neo/contracts'
+// Discovery feature router (P5). Path is API-relative; P1 mounts it below `/api`.
+//
+// Handoff to P1 (see docs/CONTRACTS.md): this feature needs the *public* Supabase
+// client (publishable/anon key, no user token, never the service role). Once
+// `backend/src/lib/` provides it, wire it as:
+//
+//   import { createDiscoveryRouter } from './features/discovery/index.ts';
+//   router.use(createDiscoveryRouter({ getPublicDb: () => publicSupabase }));
+//
+// `express` is a P1-managed dependency; this file is not compiled until it exists.
+import { Router } from 'express';
+import { handleDiscoverProjects } from './handler.ts';
+import type { PublicDb } from './service.ts';
+import { createDb } from '../../lib/supabase.js';
+import type { Env } from '../../env.js';
 
-const filters = z.strictObject({
-  q: z.string().trim().max(300).optional(), location: shortText.optional(), skill: shortText.max(60).optional(), sector: shortText.optional(), stage: stage.optional(),
-  limit: z.coerce.number().int().min(1).max(50).default(20), offset: z.coerce.number().int().min(0).default(0),
-})
-export function discoveryRouter(env?: Env) {
-  const router = Router()
-  router.get('/discover/projects', optionalAuth(env), async (req, res) => {
-    const input = parse(filters, req.query)
-    const args = Object.fromEntries(['q', 'location', 'skill', 'sector', 'stage'].filter(key => input[key as keyof typeof input] !== undefined).map(key => [`filter_${key}`, input[key as keyof typeof input]]))
-    const { limit, offset } = input
-    const { data, error, count } = await res.locals.db.rpc('discover_projects', args, { count: 'exact' }).order('created_at', { ascending: false }).order('id').range(offset, offset + limit - 1)
-    if (error) databaseError(error)
-    res.set('Cache-Control', 'no-store').json({ data: (data ?? []).map((row: Record<string, unknown>) => camel<ProjectSummary>(row)), pagination: { limit, offset, total: count ?? 0 } })
-  })
-  return router
+export interface DiscoveryDeps {
+  getPublicDb: () => PublicDb;
 }
-export const router = discoveryRouter()
+
+export function createDiscoveryRouter(deps: DiscoveryDeps): Router {
+  const router = Router();
+  router.get('/discover/projects', async (req, res) => {
+    const result = await handleDiscoverProjects(req.query as Record<string, unknown>, deps.getPublicDb());
+    res.status(result.status).json(result.body);
+  });
+  return router;
+}
+
+export { handleDiscoverProjects } from './handler.ts';
+export type { PublicDb } from './service.ts';
+
+/** P1 integration: anonymous, caller-independent discovery client; RLS stays active. */
+export const router = Router();
+router.get('/discover/projects', async (req, res) => {
+  const result = await handleDiscoverProjects(req.query as Record<string, unknown>, createDb(req.app.locals.env as Env));
+  res.set('Cache-Control', 'no-store').status(result.status).json(result.body);
+});

@@ -116,11 +116,12 @@ test('real local Supabase: signup/confirmation, founder and contributor P0 journ
     }
     await t.test('contributor filters, opens the project, and applies in the browser', async () => {
       await login(contributorPage, contributor, '/explore')
-      await contributorPage.getByLabel('Search projects').fill(run)
-      await contributorPage.getByLabel('Location', { exact: true }).fill('Newcastle')
-      await contributorPage.getByLabel('Required skill', { exact: true }).fill('React')
-      await contributorPage.getByRole('button', { name: 'Find projects', exact: true }).click()
-      await contributorPage.getByRole('link', { name: title, exact: true }).click()
+      await contributorPage.getByLabel('Search', { exact: true }).fill(run)
+      await expect(contributorPage).toHaveURL(new RegExp(`q=${run}`))
+      await contributorPage.getByLabel('Location', { exact: true }).selectOption('Newcastle')
+      await contributorPage.getByLabel('Skill needed', { exact: true }).fill('React')
+      await expect(contributorPage).toHaveURL(/skill=React/)
+      await contributorPage.locator('.disc-card').filter({ hasText: title }).click()
       await expect(contributorPage.getByText('Founder reported', { exact: true })).toBeVisible()
       await contributorPage.getByRole('button', { name: 'Apply for this opportunity', exact: true }).click()
       await contributorPage.getByLabel('Why are you a good fit?').fill('I can build the React dashboard.')

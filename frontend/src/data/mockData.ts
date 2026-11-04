@@ -1,5 +1,7 @@
 // Clearly fictional seed data for the demo. Dates are relative to "today"
 // so activity labels stay sensible whenever you run the app.
+// All milestones are founder-reported (verified: false): the contract only allows
+// 'self_reported', and no fixture may imply independently verified traction.
 import type { ContributorProfile, Person, Project } from '../../types';
 
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
@@ -164,7 +166,7 @@ export const projects: Project[] = [
         body: 'Looking for a technical cofounder based in or near Sunderland.' },
     ],
     milestones: [
-      { id: 'ssm1', title: 'Second venue onboarded', date: daysAgo(35), verified: true, evidenceUrl: 'https://example.com/shiftswap-venue-letter' },
+      { id: 'ssm1', title: 'Second venue onboarded', date: daysAgo(35), verified: false, evidenceUrl: 'https://example.com/shiftswap-venue-letter' },
       { id: 'ssm2', title: 'First paying venue', date: daysAgo(90), verified: false },
     ],
   },
