@@ -54,3 +54,26 @@ test('fixture query applies contract semantics', () => {
   assert.equal(paged.data.length, 2);
   assert.deepEqual(paged.data, all.data.slice(1, 3));
 });
+
+test('sector suggestions match word prefixes, whole-name prefixes first', async () => {
+  const { SECTORS, suggestSectors, canonicalSector } = await import('./sectors.ts');
+  assert.deepEqual(suggestSectors('fi'), ['Finance', 'Fintech', 'Sport & Fitness']);
+  assert.deepEqual(suggestSectors('FIN'), ['Finance', 'Fintech']);
+  assert.deepEqual(suggestSectors('machine'), ['Machine Learning']);
+  assert.deepEqual(suggestSectors('soft'), ['Software Engineering']);
+  assert.deepEqual(suggestSectors('learn'), ['Machine Learning']);
+  assert.deepEqual(suggestSectors('data an'), ['Data & Analytics']);
+  assert.deepEqual(suggestSectors('zzz'), []);
+  assert.equal(suggestSectors('').length, SECTORS.length);
+  assert.equal(suggestSectors('', 5).length, 5);
+  assert.equal(canonicalSector('  fintech '), 'Fintech');
+  assert.equal(canonicalSector('Fin'), null);
+  assert.equal(new Set(SECTORS.map((s) => s.toLowerCase())).size, SECTORS.length, 'no duplicates');
+  assert.ok(SECTORS.every((s) => s.length <= 120));
+});
+
+test('frontend and backend sector lists are identical', async () => {
+  const fe = await import('./sectors.ts');
+  const be = await import('../../../../backend/src/features/discovery/sectors.ts');
+  assert.deepEqual([...fe.SECTORS], [...be.SECTORS]);
+});

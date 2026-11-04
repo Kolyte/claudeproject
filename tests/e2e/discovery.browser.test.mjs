@@ -88,6 +88,33 @@ describe('discovery UI', { skip }, () => {
     await page.close();
   });
 
+  test('sector type-ahead suggests fixed sectors and filters by the chosen one', async () => {
+    const page = await browser.newPage();
+    await page.goto(`${BASE}/explore`);
+    await settled(page);
+    const box = page.getByRole('combobox', { name: 'Sector' });
+    await box.fill('fi');
+    const list = page.getByRole('listbox', { name: 'Sector suggestions' });
+    const options = list.getByRole('option');
+    await options.first().waitFor();
+    const names = await options.allInnerTexts();
+    assert.ok(names.includes('Finance') && names.includes('Fintech'), `suggestions were ${names.join(', ')}`);
+    await list.getByRole('option', { name: 'Fintech' }).click();
+    await page.waitForURL((u) => new URL(u).searchParams.get('sector') === 'Fintech');
+    assert.equal(await box.inputValue(), 'Fintech');
+    await settled(page);
+
+    await box.fill('');
+    await box.pressSequentially('clim');
+    await box.press('ArrowDown');
+    await box.press('Enter');
+    await page.waitForURL((u) => new URL(u).searchParams.get('sector') === 'Climate');
+    if ((await settled(page)) === 'results') {
+      for (const card of await page.locator('.disc-card').all()) assert.match(await card.innerText(), /Climate/);
+    }
+    await page.close();
+  });
+
   test('no-results state offers a way back', async () => {
     const page = await browser.newPage();
     await page.goto(`${BASE}/explore?skill=zz-no-such-skill-e2e`);

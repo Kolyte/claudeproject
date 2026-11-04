@@ -13,7 +13,7 @@ export const LEGACY_PROJECTS = [
     pitch: 'Low-cost sensors and small services to monitor river quality and urban run-off in Newcastle and Gateshead.',
     problem: 'Community groups have little timely, local data about run-off and water quality on smaller Tyneside watercourses.',
     solution: 'Cheap sensor nodes report readings to a simple API and public dashboard so volunteers can spot problems early.',
-    sector: 'CleanTech & IoT',
+    sector: 'CleanTech',
     location: 'Newcastle', // legacy fixture said "Newcastle Helix"; canonical filters use the town
     stage: 'prototype',
     status: 'active',

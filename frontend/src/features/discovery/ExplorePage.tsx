@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import DiscoveryResults from './DiscoveryResults.tsx';
 import FixtureNotice from './FixtureNotice.tsx';
+import SectorInput from './SectorInput.tsx';
 import {
   FILTER_KEYS,
   NORTH_EAST_LOCATIONS,
@@ -124,6 +125,13 @@ export default function ExplorePage() {
             ))}
           </datalist>
         </label>
+        <SectorInput
+          label="Sector"
+          className="disc-field"
+          placeholder="Any sector"
+          value={filters.sector ?? ''}
+          onChange={(sector) => setFilter('sector', sector)}
+        />
         <label className="disc-field">
           <span>Stage</span>
           <select value={filters.stage ?? ''} onChange={(e) => setFilter('stage', e.target.value)}>
