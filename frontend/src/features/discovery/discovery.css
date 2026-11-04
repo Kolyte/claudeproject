@@ -1,0 +1,117 @@
+/* P5 discovery styles. Every selector is prefixed `disc-` to stay scoped to this feature.
+   Uses the shared design tokens from the app shell (index.css). */
+
+.disc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.disc-fixture-notice {
+  background: #fff7e8;
+  border: 1px dashed var(--amber);
+  color: #7a4f12;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  margin: 0 0 16px;
+}
+
+/* Landing */
+.disc-hero { text-align: center; padding: 32px 0 24px; }
+.disc-hero h1 { font-size: clamp(1.7rem, 5vw, 2.6rem); letter-spacing: -0.02em; max-width: 22ch; margin: 0 auto 12px; }
+.disc-hero-lead { color: var(--muted); font-size: 1.1rem; margin-bottom: 20px; }
+.disc-hero-search { display: flex; gap: 8px; max-width: 560px; margin: 0 auto 16px; }
+.disc-hero-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  background: var(--surface);
+}
+.disc-places { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.disc-place {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--primary);
+}
+.disc-place:hover { border-color: var(--primary); }
+
+.disc-section { margin-top: 32px; }
+.disc-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.disc-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.disc-step { padding: 18px; }
+.disc-step-num {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+.disc-cta { text-align: center; margin: 40px 0 8px; padding: 28px 16px; border-radius: var(--radius); background: #eef2f6; }
+
+/* Explore */
+.disc-explore-head { margin-bottom: 16px; }
+.disc-filters {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, minmax(0, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+.disc-field { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; font-weight: 600; color: var(--muted); min-width: 0; }
+.disc-field input,
+.disc-field select {
+  font: inherit;
+  font-weight: 400;
+  color: var(--text);
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  width: 100%;
+}
+.disc-clear { align-self: end; }
+.disc-count { min-height: 1.3em; margin: 4px 0 12px; }
+
+/* Card */
+.disc-card { display: flex; flex-direction: column; text-decoration: none; color: inherit; overflow: hidden; }
+.disc-card:hover { border-color: var(--primary); }
+.disc-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.disc-card-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.disc-card-title { font-size: 1.1rem; margin: 4px 0 0; }
+.disc-card-pitch { margin: 0; overflow-wrap: anywhere; }
+.disc-card-meta { margin: 0; }
+.disc-card-needs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.disc-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-right: 2px; }
+.disc-card-foot { border-top: 1px solid var(--border); padding: 10px 16px; }
+
+/* States */
+.disc-state { text-align: center; padding: 40px 16px; border: 1px dashed var(--border); border-radius: var(--radius); }
+.disc-skeleton { min-height: 220px; background: linear-gradient(90deg, #f1eee7 25%, #f8f6f1 50%, #f1eee7 75%); background-size: 200% 100%; animation: disc-shimmer 1.2s infinite linear; }
+@keyframes disc-shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .disc-skeleton { animation: none; } }
+.disc-more { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 20px; }
+
+@media (max-width: 760px) {
+  .disc-filters { grid-template-columns: 1fr 1fr; }
+  .disc-field-wide { grid-column: 1 / -1; }
+  .disc-hero-search { flex-direction: column; }
+}
+@media (max-width: 420px) {
+  .disc-filters { grid-template-columns: 1fr; }
+}
