@@ -1,4 +1,5 @@
 /** Wire contracts only. Import with `import type`; this package has no runtime exports. */
+export type { Database, Json, Tables, TablesInsert, TablesUpdate, Enums, CompositeTypes } from './database.js'
 export type ProjectStage = 'idea' | 'prototype' | 'mvp' | 'launched'
 export type ProjectStatus = 'active' | 'paused' | 'completed'
 export type Visibility = 'draft' | 'public'
