@@ -41,7 +41,7 @@ npm --prefix backend run dev
 npm --prefix frontend run dev
 ```
 
-First copy each package's `.env.example` to its ignored `.env` and configure the same Supabase URL and publishable key. See [setup](docs/SETUP.md) for local Supabase and production commands. Public pages render without Auth configuration; account routes show a setup notice until configured.
+The checked-in `backend/.env` and `frontend/.env` contain the shared hosted demo URL and publishable key, so both packages connect to the same database immediately. `.env.example` files describe the variables for another environment. See [setup](docs/SETUP.md) for local Supabase and production commands. Public pages render without Auth configuration; account routes show a setup notice until configured.
 
 ## Check coordination
 
@@ -55,3 +55,7 @@ node scripts/coordination/check-ownership.mjs --base origin/main --branch p1/you
 Replace the example branch with your assigned `p1/`–`p5/` branch. The local check includes committed changes, tracked working changes and untracked, non-ignored files since the merge base. CI validates PR files against the policy already on the base branch.
 
 The three-hour target is a live founder → project → opportunity → contributor application → founder review journey. P0 must pass before stretch features enter the demo.
+
+## Contact
+
+dylanleonardleedsuk@gmail.com

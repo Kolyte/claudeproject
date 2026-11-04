@@ -46,7 +46,9 @@ Frontend dev remains on port 5173 and proxies `/api` to `http://localhost:3001`.
 
 ## Environment contract
 
-Redacted `.env.example` files are provided in both app packages. Put real values in ignored `.env` files/provider settings. Frontend variables are public build inputs.
+Complete `backend/.env` and `frontend/.env` files are checked in with the shared hosted demo URL and publishable key. These are public connection settings; the key also ships in the frontend bundle and relies on RLS. `.env.example` files describe the variables for other environments. Other `.env.*` files remain ignored; administrative and account credentials belong in provider settings or ignored local files. Frontend variables are public build inputs.
+
+For a local Supabase stack, replace the URL and publishable key in both app `.env` files with the local stack's values. Production Render variables override the backend `.env`, including `PORT` and `NODE_ENV`.
 
 | Variable | Location | Use |
 |---|---|---|
