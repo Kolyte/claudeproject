@@ -12,6 +12,8 @@ interface Props {
   skeletonCount?: number;
   /** Serialised filters this state belongs to; exposed for tests and debugging. */
   queryKey?: string;
+  /** Heading level for card titles; see DiscoveryCard. */
+  cardHeadingLevel?: 2 | 3;
 }
 
 /** Renders loading, error, empty and result states for a discovery query. */
@@ -23,10 +25,10 @@ export default function DiscoveryResults(props: Props) {
   );
 }
 
-function ResultsBody({ state, onRetry, empty, onLoadMore, loadingMore, moreError, skeletonCount = 6 }: Props) {
+function ResultsBody({ state, onRetry, empty, onLoadMore, loadingMore, moreError, skeletonCount = 6, cardHeadingLevel = 3 }: Props) {
   if (state.status === 'loading') {
     return (
-      <div className="grid" aria-busy="true" aria-label="Loading projects">
+      <div className="grid disc-grid" aria-busy="true" aria-label="Loading projects">
         {Array.from({ length: skeletonCount }, (_, i) => (
           <div key={i} className="card disc-skeleton" aria-hidden="true" />
         ))}
@@ -49,9 +51,9 @@ function ResultsBody({ state, onRetry, empty, onLoadMore, loadingMore, moreError
   const remaining = state.total - state.items.length;
   return (
     <>
-      <div className="grid" data-testid="discovery-results">
+      <div className="grid disc-grid" data-testid="discovery-results">
         {state.items.map((p) => (
-          <DiscoveryCard key={p.id} project={p} />
+          <DiscoveryCard key={p.id} project={p} headingLevel={cardHeadingLevel} />
         ))}
       </div>
       {onLoadMore && remaining > 0 && (

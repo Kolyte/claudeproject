@@ -38,7 +38,7 @@
     "p4": {
       "name": "Opportunities",
       "branchPrefix": "p4/",
-      "files": [],
+      "files": ["ERRORS.md"],
       "prefixes": ["frontend/src/features/opportunities/", "backend/src/features/opportunities/"]
     },
     "p5": {

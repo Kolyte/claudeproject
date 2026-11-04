@@ -2,7 +2,7 @@
 
 > **Discover what the North East is building. Find a project worth joining, or the people who can help build yours.**
 
-**Status:** Hackathon concept / MVP specification
+**Status:** Original product vision with implemented P0 core. Reviewed on 4 November 2026: Auth/profile, projects, activity/milestones, opportunities/applications and discovery are integrated, including the approved frontend redesign. Full hosted acceptance/rehearsal still need recorded evidence. GitHub import, AI extraction, matching, following and investor features below describe future scope. See [roadmap](ROADMAP.md), [contracts](docs/CONTRACTS.md) and [demo guide](docs/DEMO.md) for the current delivery boundary.
 
 **Region:** North East England
 
@@ -224,6 +224,8 @@ The three-hour delivery plan and named work lanes are defined in [ROADMAP.md](RO
 
 ## 8. Suggested Technical Architecture
 
+The implemented P0 uses React/Vite/TypeScript, Express/Node 24, Supabase Auth/PostgreSQL/RLS and one Render service. Storage, GitHub/AI processing, normalized skill tables, membership, follows and investor entities below are future architecture, not current endpoints or tables. Actual P0 tables and substring discovery semantics are in the contracts; no full-text search service is implemented.
+
 - **Frontend:** React + Vite + TypeScript; feature-scoped CSS and shared UI styles.
 - **API:** Express running on Node.js with TypeScript.
 - **Backend/database:** Supabase (PostgreSQL, Auth, Storage, Row Level Security).
@@ -292,6 +294,8 @@ Explain which evidence contributed to each dimension, flag uncertainty and allow
 
 ## 11. Demo Script (3–5 Minutes)
 
+This is the original broader-vision script. The executable P0 rehearsal is [docs/DEMO.md](docs/DEMO.md): founder publication/progress/need → contributor discovery/application → founder review → refresh. GitHub extraction, recommendations, following and investor views must not be presented as delivered features unless their ordered stretch tasks have separately passed acceptance.
+
 1. **Problem (20s):** A North East student has an idea but cannot find complementary skills; existing project listings give no indication of progress.
 2. **Founder (50s):** Create a project, publish its page, add a milestone and open a specific need.
 3. **Contributor (60s):** Connect a demo GitHub account, inspect extracted skills and receive explainable matches.
@@ -299,7 +303,7 @@ Explain which evidence contributed to each dimension, flag uncertainty and allow
 5. **Community (30s):** Follow the project and see subsequent updates.
 6. **Stretch (30s):** Show investor filtering and the same project's history from an investor's perspective.
 
-Use seeded, clearly fictional demo data to ensure the flow works reliably without live API dependencies.
+Use seeded, clearly fictional records persisted in Supabase. The final P0 demo still exercises the live API and database; fixtures must not silently replace them.
 
 ## 12. Suggested Hackathon Build Sequence
 
@@ -357,7 +361,7 @@ Compare against existing cofounder matching and startup-community platforms.
 
 - Domain for North East Origins.
 - Whether to start with university communities only or recruit local professionals immediately.
-- Whether public project pages are indexed by search engines by default.
-- Whether applications use in-app messaging or contact requests for the MVP.
-- What constitutes a substantive update, and how activity labels are calibrated.
+- Public indexing after launch; the current hackathon preview sends `noindex, nofollow`.
+- Post-P0 contact/messaging policy; P0 supports application messages and status review, not chat or contact requests.
+- Post-P0 activity-label calibration; the current contract counts progress/milestone/roadblock posts and standalone milestones, with S-02 thresholds defined in the roadmap but not integrated.
 - Which specific hackathon judging criteria and sponsor APIs should shape the demo.

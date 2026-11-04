@@ -2,7 +2,9 @@
 
 **Target:** five people, each supervising coding agents, deliver a live Supabase-backed founder → published project → progress → open need → contributor application → founder review journey.
 
-This file defines work; GitHub issues record live status. All application tasks below are initially **not started**. The existing `frontend/` is a Vite starter with fictional fixtures. Keep it in place. The [project brief](project%20brief.md) describes the broader vision; this roadmap controls the three-hour build.
+This file defines scope, ownership and acceptance; GitHub issues record live status. The three-hour checkpoints below are the original execution plan. As reviewed on 4 November 2026, P0 feature code is integrated, including Auth/profile, project publication, activity/milestones, opportunities/applications and discovery. The frontend includes the approved Network Design Kit redesign and bridge logo; preserve these when integrating changes. Legacy starter/demo sources remain available but are not the active application.
+
+The hosted P0 gate is still awaiting a complete recorded multi-account journey and rehearsal. See [P1 issue #1](https://github.com/Kolyte/claudeproject/issues/1), [P4 issue #7](https://github.com/Kolyte/claudeproject/issues/7) and [demo acceptance](docs/DEMO.md). Earlier issue wording may precede merged PRs: P4 #6 and sector PRs #13/#14 are integrated. Do not interpret an open issue as evidence that its implementation is absent. The [project brief](project%20brief.md) retains the broader vision.
 
 ## Before the clock starts
 
@@ -73,6 +75,8 @@ P2–P5 may build isolated components using fixtures before P1-02 lands. Fixture
 ## Ordered stretch goals
 
 Start only after P0 passes. Finish one increment before taking on the next; skip nothing silently and record any scope decision in the task issue. P1 supplies shared contracts/schema before dependent lane work.
+
+None of S-01–S-06 is accepted as a complete live feature by the evidence reviewed here. Legacy matching, follow state and activity helpers are disconnected demo code; they do not satisfy persistence, canonical-contract or acceptance requirements. Actual last-substantive-update dates already appear in discovery; S-02's activity labels remain separate work.
 
 | Order/ID | Owner | Goal and done condition |
 |---|---|---|

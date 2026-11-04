@@ -148,6 +148,28 @@ describe('discovery UI', { skip }, () => {
     await page.close();
   });
 
+  test('maximum-length unbroken text wraps at 320px and card headings follow the page h1', async () => {
+    const page = await browser.newPage({ viewport: { width: 320, height: 640 } });
+    const long = 'X'.repeat(120);
+    const project = {
+      id: '00000000-0000-4000-8000-0000000000aa', title: long, pitch: 'P'.repeat(300), sector: 'Fintech',
+      location: 'L'.repeat(120), stage: 'idea', status: 'active', ownerDisplayName: 'O'.repeat(120),
+      requiredSkills: ['S'.repeat(60)], openNeedsCount: 1, lastSubstantiveUpdateAt: null, createdAt: new Date().toISOString(),
+    };
+    await page.route('**/api/discover/projects**', (route) =>
+      route.fulfill({ json: { data: [project], pagination: { limit: 12, offset: 0, total: 1 } } }),
+    );
+    await page.goto(`${BASE}/explore`);
+    assert.equal(await settled(page), 'results');
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    assert.ok(overflow <= 0, `overflows horizontally by ${overflow}px`);
+    const title = page.locator('.disc-card-title');
+    const clipped = await title.evaluate((el) => el.scrollWidth > el.clientWidth);
+    assert.equal(clipped, false, 'title text is cut off');
+    assert.equal(await title.evaluate((el) => el.tagName), 'H2', 'Explore cards sit directly under the page h1');
+    await page.close();
+  });
+
   test('narrow mobile viewport has no horizontal overflow and usable filters', async () => {
     const page = await browser.newPage({ viewport: { width: 375, height: 740 } });
     for (const path of ['/', '/explore']) {

@@ -156,6 +156,7 @@ export default function ExplorePage() {
       <DiscoveryResults
         state={state}
         queryKey={toQueryString(filters)}
+        cardHeadingLevel={2}
         onRetry={retry}
         onLoadMore={loadMore}
         loadingMore={loadingMore}

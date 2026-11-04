@@ -1,10 +1,10 @@
 # Integration contracts — v1
 
-**Status:** specification for the timed build; the API, schema and shared package are not implemented by this document. P1 materializes and freezes these interfaces by minute 20. Changes go through P1 and name affected lanes before consumers change. All times are UTC ISO-8601; IDs are UUID strings in the live application.
+**Status:** implemented P0 integration contract, reviewed against source on 4 November 2026. The API, shared package and six-table schema exist; this document describes their agreed boundary rather than providing implementation or proof of hosted acceptance. Changes go through P1 and name affected lanes before consumers change. All times are UTC ISO-8601; IDs are UUID strings in the live application.
 
 ## Repository and composition boundaries
 
-| Area | Owner | Planned location/export |
+| Area | Owner | Location/export |
 |---|---|---|
 | Shared type-only package | P1 | `shared/src/index.ts`, npm name `@neo/contracts`; consumers use `import type` |
 | Auth/profile | P1 | `frontend/src/features/auth/`; `backend/src/features/identity/` |
@@ -14,7 +14,7 @@
 | Discovery | P5 | `frontend/src/features/discovery/`; `backend/src/features/discovery/` |
 | Shared wiring | P1 | `frontend/src/App.tsx`, `backend/src/routes.ts`, shared UI/libs |
 
-Each backend feature exports `router` from its `index.ts`, using full API-relative paths below. P1 mounts feature routers below `/api`; features do not edit the registry. Each frontend feature exposes an `index.ts` public entrypoint. P1 creates shared dependencies/config first; feature owners create their own exports; P1 only wires imports after those exports land. No cross-lane scaffold exception is needed.
+Each backend feature exports `router` from its `index.ts`, using full API-relative paths below; identity uses `identityRouter(env)`. P1 mounts feature routers below `/api`; features do not edit the registry. Each frontend feature exposes an `index.ts` or `index.tsx` public entrypoint. Shared plumbing and feature exports are integrated. New features must expose their entrypoints before P1 adds wiring.
 
 Frontend page exports: P1 `LoginPage`, `SignupPage`, `ProfilePage`; P2 `ProjectPage`, `NewProjectPage`, `EditProjectPage`, `MyProjectsPage`; P4 `MyApplicationsPage`, `ReviewApplicationsPage`; P5 `LandingPage`, `ExplorePage`. P1 wires `/`, `/explore`, `/login`, `/signup`, `/profile`, `/projects/new`, `/projects/:projectId`, `/projects/:projectId/edit`, `/dashboard/projects`, `/dashboard/applications`, and `/projects/:projectId/applications`. Put the literal `new` route ahead of the parameter route. Page components read route parameters through the agreed router installed by P1.
 
@@ -80,9 +80,13 @@ Error codes: 400 `VALIDATION_ERROR`, 401 `UNAUTHENTICATED`, 403 `FORBIDDEN`, 404
 
 Discovery excludes drafts. `q` searches title/pitch case-insensitively; location, sector and stage are exact case-insensitive filters. `skill` matches at least one required skill on an open need. Combine supplied filters with AND; sort by project creation descending, then ID ascending for stable pagination. No filter means all published projects, including ideas without updates. Never use posting frequency as a quality score. Owners may pause/complete projects; public status stays visible.
 
+Sector discovery and project writes use the fixed 38-entry list in `frontend/src/features/discovery/sectors.ts` and `backend/src/features/discovery/sectors.ts`; the discovery tests enforce list parity. `sector` remains a string on the wire. Case-insensitive exact matches are normalized to their canonical label; unknown sectors return 400. `SectorInput`, `SECTORS`, `canonicalSector` and `suggestSectors` are public discovery exports. The type-ahead suggests word-prefix matches, but submission requires a full listed label. Older projects with unlisted sectors remain stored; editing them requires choosing a listed sector. No data migration was added for this change.
+
+Current limits: `Application` has no role title/project summary, so the applicant dashboard cannot name the role from its response alone. Only `open` needs accept applications; `reviewing`, `filled` and `closed` reject them. Project `paused`/`completed` status does not itself close an open need. Any change to these behaviours needs an agreed contract and implementation, not a documentation-only promise.
+
 ## Database and trust boundaries
 
-P1 owns all migrations and generated database types under `supabase/`/`shared/`. Initial tables: `profiles`, `projects`, `project_posts`, `milestones`, `project_needs`, `applications`. Use UUID PKs, foreign keys, timestamps and enum/check constraints matching the models. Use text arrays for P0 skills/interests; normalized taxonomy, membership administration and follows wait for their roadmap task.
+P1 owns all migrations and generated database types under `supabase/`/`shared/`. Implemented tables: `profiles`, `projects`, `project_posts`, `milestones`, `project_needs`, `applications`. Migrations are `202611040001_p0_foundation.sql`, `202611040002_discovery.sql` and `202611040003_seed_record_guards.sql`; hosted application of all three is recorded in issue #1. UUID PKs, foreign keys, timestamps and enum/check constraints back the models. P0 skills/interests use text arrays; normalized taxonomy, membership administration and follows wait for their roadmap task.
 
 - `profiles.id` references Supabase Auth's user ID. Profiles are self-readable/self-writable. Email/password remain in Supabase Auth. Use an idempotent profile bootstrap after login.
 - Project `owner_id` derives from the token and stays immutable. `owner_display_name` is a public snapshot from the owner's display name. A project begins as a draft. Publishing requires title, pitch, problem, solution, sector, location and stage.
@@ -90,6 +94,7 @@ P1 owns all migrations and generated database types under `supabase/`/`shared/`.
 - Milestone verification is always `self_reported`; arbitrary evidence links do not confer verification. Store evidence as a validated http/https URL, never fetch or execute it during creation.
 - Application rows are readable only by the applicant and relevant project owner. Server-derived IDs and RLS `WITH CHECK` prevent applicant/need reassignment. Only the documented status transitions are allowed.
 - P1 supplies a restricted review-summary SQL function to reveal only the applicant subset to the owning founder, checking `auth.uid()` and project relationship inside the function. Deny anonymous invocation; fix its search path; do not expose arbitrary profiles.
+- The implemented helper is `application_review_summary(application_id uuid)`, called by P4's Supabase repository. Its result contains only `displayName`, `declaredSkills` and `hoursPerWeek`.
 - Accepting an application records the decision; it does not grant project edit rights or promise equity. Filled/closed needs stop new applications while retaining existing submissions.
 
 P1 implements these restrictions in database policies/functions as well as Express validation. Use field-specific mutation allowlists and constrain ownership on both old and new rows. P5 tests requests as anonymous, owner, applicant and unrelated account. No service-role bypass in application endpoints.
@@ -99,6 +104,8 @@ P1 implements these restrictions in database policies/functions as well as Expre
 Trim user strings. Title/display name ≤120 characters; pitch ≤300; long text ≤5,000; location/sector ≤120; each skill/interest ≤60, at most 30 unique entries per array; hours are integers 1–80, or null for an unknown profile value. Required text cannot be blank; profile bio may be empty. Reject unknown enum values and invalid IDs. Use parameterized Supabase queries and escape UI text; no raw HTML from posts.
 
 Show the date of the latest progress, milestone or roadblock; announcements/opportunity posts do not count as substantive progress. Expose the date before the optional S-02 label. Projects with no such history display “No progress update yet.” A new idea is not marked dormant for lacking history. Private drafts are excluded from discovery; public indexing remains disabled for the hackathon preview until a launch decision.
+
+Discovery computes this date from substantive post `createdAt` values and standalone milestone `achievedAt` values. It currently reads published project rows and their related needs/history before filtering and pagination in the API; this is suitable for demo scale, not an indexed search service. S-02 labels are not wired into the active app. The legacy activity helper's thresholds are not this contract.
 
 ## Existing fixtures
 

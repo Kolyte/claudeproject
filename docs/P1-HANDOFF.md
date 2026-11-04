@@ -1,47 +1,49 @@
-# P1 implementation handoff
+# Platform and integration handoff
 
-The product scope, permissions and wire contracts remain defined by `ROADMAP.md` and `docs/CONTRACTS.md`. The app now uses canonical API-backed feature modules. The legacy demo pages, memory provider and fixtures are preserved as source material but are not imported by the active app. There is no automatic fixture/local-storage fallback and no matching or following route in P0.
+Reviewed on 4 November 2026. ROADMAP.md defines scope, CONTRACTS.md defines interfaces, and GitHub issues hold live status.
 
-## Branch and integration
+## Integrated application
 
-- Task and current branch/release evidence: [GitHub issue #1](https://github.com/Kolyte/claudeproject/issues/1). Platform follow-up: `p1/platform-verification`, PR #4.
-- The human expanded P1's task to replace the demo across the P0 feature areas. This is an explicit cross-lane implementation handoff, not a change to the five-lane ownership policy.
-- PR #2 registered legacy paths introduced by the incoming demo and is merged. PR #3 merged the combined P0 implementation; PR #5 corrected the public-route Auth gate.
-- The combined replacement touches P2–P5 paths under that human instruction. The ordinary P1 ownership check flags them. The human subsequently explicitly instructed P1 to merge this combined PR into main after consistency checks; that authorization is a one-off integration exception, not a change to future lane ownership.
-- P5's discovery work landed on main during integration and is preserved here, wired to the P1 platform. The separate `origin/p4/opportunities` branch overlaps the current opportunities module; P4 must rebase and reconcile it against the integrated base.
+Platform/contracts/Auth/profile and the combined P0 application landed through PRs #2–#5; public environment configuration through #11/#12. [P4 PR #6](https://github.com/Kolyte/claudeproject/pull/6) is merged: its repository uses caller-scoped clients and application_review_summary(application_id uuid), resolving the former adapter-name conflict.
 
-## Run locally
+The approved Network Design Kit redesign and palette-matched SVG bridge are on main. Preserve the current presentation. [PR #13](https://github.com/Kolyte/claudeproject/pull/13) adds fixed-sector discovery and [PR #14](https://github.com/Kolyte/claudeproject/pull/14) adds sector selection and validation to project writes. Older unlisted sectors remain stored until edited.
 
-Use Node 24. There is no workspace conversion. Run `npm --prefix backend ci` and `npm --prefix frontend ci` from the repository root.
+App.tsx and backend routes.ts wire all P0 features. Legacy pages, the memory provider and matching/activity helpers are retained source material, disconnected from the active app. There is no automatic fixture fallback or live matching/following route.
 
-The checked-in `backend/.env` and `frontend/.env` connect both packages to the shared hosted demo with its public publishable key. Use `.env.example` as the variable reference when configuring another environment. Never use a service-role key in either app. Run `npm --prefix backend run dev` and `npm --prefix frontend run dev` in separate terminals. Vite proxies `/api` to port 3001. Without frontend Supabase configuration, public landing/discovery pages still render and account routes show a setup notice. Health remains available; data APIs do not fake success.
+## Shared interfaces
 
-For the dedicated local stack, run `npx supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor`. Local API and database ports are 55421 and 55422. Email confirmation is enabled; local mail is captured by Mailpit. Ordered migrations run on initial local startup. Do not apply to a hosted project until its target/access are confirmed.
+- Type-only @neo/contracts supplies canonical UUID/camelCase wire models and generated database types.
+- Frontend: api, save, useResource, useAuth, RequireAuth, Feedback, Field and Pager.
+- Backend: requireAuth, optionalAuth, createDb, HttpError and strict validators. Verified identity is res.locals.user; the caller-scoped client is res.locals.db.
+- Discovery exposes SectorInput, SECTORS, canonicalSector and suggestSectors alongside its pages.
+- The restricted review helper exposes only displayName, declaredSkills and hoursPerWeek to the owning founder.
 
-Production commands are in `docs/SETUP.md`; `render.yaml` describes one Node service and disables automatic deployment. The hosted app is [north-east-origins.onrender.com](https://north-east-origins.onrender.com/). Provider configuration, exact release commits and acceptance evidence are tracked in issue #1.
+Original combined implementation and redesign handoffs did not permanently transfer ownership. Future work follows coordination/ownership.json. [Setup](SETUP.md) has local/deployment commands and explicit feature checks.
 
-## Shared integration interfaces
+## Verified evidence and remaining work
 
-- `@neo/contracts`: type-only local dependency in both packages. Use `import type` and the canonical UUID/camelCase models.
-- Frontend: `api<T>(path, options)`, `save<T>(path, body, method)`, `useResource<T>(path)`, `useAuth()`, `RequireAuth`, shared `Feedback`, `Field` and `Pager`.
-- Backend: `requireAuth`, `optionalAuth`, `createDb`, `HttpError`, strict validation helpers. Verified identity is in `res.locals.user`; the caller-scoped Supabase client is `res.locals.db`.
-- Feature public exports and the documented routes are wired in `frontend/src/App.tsx` and `backend/src/routes.ts`.
-- Restricted SQL review helper: `application_review_summary(application_id uuid)` returns only displayName, declaredSkills and hoursPerWeek to the owning founder. P4's branch currently expects a differently named helper; reconcile that adapter without widening profile access.
+[P1 issue #1](https://github.com/Kolyte/claudeproject/issues/1) records all three hosted migrations, rolled-back permission assertions, configured Auth redirects, real email confirmation/profile editing, login/sign-out/session persistence, and the last recorded deployment at 025a5d8098066e443e49fc129517b599ac3e556a. Those Auth/setup tasks are delivered.
 
-## What each lane should do next
+Read-only HTTP checks during this documentation review returned health 200, discovery 200, anonymous /api/me 401 and unknown API JSON 404, all with X-Robots-Tag: noindex, nofollow. These establish routing/reachability, not the deployed commit or full acceptance. Auto-deploy was recorded as disabled; do not assume later main changes are live.
 
-| Lane | Next responsibility |
+| Owner | Remaining work |
 |---|---|
-| P1 | Own shared adapters, dependencies, generated types, migrations/RLS, identity and hosting. Finish hosted Auth redirects/account checks and HTTP health-check configuration; keep release evidence in issue #1. |
-| P2 | Review the canonical project creation/edit/publication and dashboard implementation in `features/projects/`; verify draft visibility and composition of P3/P4 public exports. |
-| P3 | Review `features/activity/`; finish timeline/empty/error states and preserve self-reported milestones and canonical post types. |
-| P4 | Reconcile `p4/opportunities` with the shared middleware and review-summary function. Keep applications private and status transitions backed by the database. Do not change the wire contract to fit a local type. |
-| P5 | Discovery/seed/test work from main is included. Exercise the documented fictional seed against the real schema and run the full deployed acceptance checklist. Coordinate sequential integration and rehearsal. |
+| P1 | Verify selected release commit/CI; maintain shared integrations; extend CI to feature tests; verify repository protection with an administrator. Deployment requires explicit authorization. |
+| P2 | Recheck draft/publication/dashboard composition and project-specific QA on the chosen release. |
+| P3 | Recheck timeline/milestones and validation findings. S-02 labels remain stretch work. |
+| P4 | Run hosted needs/application permission checks after #6; address role identity, paging, validation and action UX findings. Request contract changes from P1. |
+| P5 | Record hosted fictional seed with three accounts, complete the deployed multi-account/mobile journey and three-minute rehearsal, and record exact release commit/URL. |
 
-## Verification and limits
+Local tests, hosted database assertions and public/Auth smoke are separate evidence. None replaces the complete [hosted P0 gate](DEMO.md).
 
-The backend unit/API and PostgreSQL-engine checks cover validation, RLS, draft privacy, owner writes, application privacy, duplicate/closed needs, restricted summaries and terminal transitions. `tests/e2e/p0.test.mjs` exercises real local Supabase Auth/PostgREST plus two browser sessions, signup/email confirmation, discovery/application/review, refresh persistence and a 390px mobile viewport. It also applies P5's documented fictional seed twice against the real local schema. It creates and removes isolated local test accounts; it refuses remote targets.
+## QA and test coverage
 
-To run that end-to-end test, provide ignored `.env.test` with local `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEO_API_URL`, `NEO_UI_URL` and `NEO_MAILPIT_URL`, then run `node --env-file=.env.test --test tests/e2e/p0.test.mjs`. The local administrative key is used only by test-account setup/cleanup, never by application requests. The browser test currently uses installed Microsoft Edge through Playwright.
+[PR #10](https://github.com/Kolyte/claudeproject/pull/10) reports 18 historical findings against 8e4e59c, before the redesign. Reproduce on current main before treating a finding as a current failure. Orange-button contrast and unloaded-Inter observations refer to superseded styling; the current app has different colours and self-hosted fonts. Source changes alone do not constitute a fresh accessibility audit.
 
-Hosted database permission assertions and deployed public-route checks have passed; see issue #1 for the tested release. Hosted email confirmation, the fictional seed and the full team rehearsal require their own evidence. Passing local checks or public-page smoke checks does not mark the hosted P0 journey complete.
+Current source still has no role title in Application, opportunities ordered newest-first before pagination, an hours input using valueAsNumber, and h3 discovery-card headings. Recheck those alongside the report's auth/error, long-text, touch-target and validation cases. Only open needs accept applications; paused/completed project status does not itself close a need.
+
+Default backend tests/platform CI omit feature-folder tests. Run discovery (including sector tests), fixtures and opportunities explicitly. Historical bundle-size/Fast Refresh warnings are not failing tests.
+
+## Documentation refresh handoff
+
+The human requested all documentation updated, then explicitly authorized merging all PRs while retaining the current design. This task uses P1 branch p1/documentation-refresh in a separate checkout. Updates to the P5 demo guide and P4 audit are documentation-only handoffs under that request; ordinary feature ownership remains unchanged. No task issue was supplied. PRs carry changes and verification; no unsolicited issue comments are required.
