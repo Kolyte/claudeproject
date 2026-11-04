@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtemp, writeFile, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { AddressInfo } from 'node:net'
@@ -54,6 +54,40 @@ test('API health, protected access, errors and production SPA are distinct', asy
     assert.equal(deepLink.status, 200)
     assert.match(await deepLink.text(), /North East Origins test/)
     assert.equal((await fetch(`${origin}/assets/missing.js`)).status, 404)
+  } finally {
+    await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()))
+    await rm(dir, { recursive: true, force: true })
+  }
+})
+
+test('production SPA works below a hidden checkout directory without exposing hidden assets', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'neo-hidden-app-'))
+  const frontendDir = join(dir, '.codex', 'worktrees', 'frontend', 'dist')
+  await mkdir(join(frontendDir, 'assets'), { recursive: true })
+  const html = '<html><body>North East Origins hidden checkout</body></html>'
+  await writeFile(join(frontendDir, 'index.html'), html)
+  await writeFile(join(frontendDir, 'assets', 'app.js'), 'console.log("built app")')
+  await writeFile(join(frontendDir, 'assets', '.private.js'), 'private asset sentinel')
+  const server = createApp({ port: 3001, production: true }, frontendDir).listen(0, '127.0.0.1')
+  await new Promise<void>(resolve => server.once('listening', resolve))
+  const origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+  try {
+    for (const path of ['/', '/projects/example']) {
+      const page = await fetch(`${origin}${path}`, { headers: { Accept: 'text/html' } })
+      assert.equal(page.status, 200)
+      assert.equal(page.headers.get('cache-control'), 'no-cache')
+      assert.equal(await page.text(), html)
+    }
+    const asset = await fetch(`${origin}/assets/app.js`)
+    assert.equal(asset.status, 200)
+    assert.match(asset.headers.get('content-type') ?? '', /javascript/)
+    assert.equal(await asset.text(), 'console.log("built app")')
+    for (const path of ['/assets/missing.js', '/assets/.private.js', '/api/not-a-route']) {
+      const missing = await fetch(`${origin}${path}`, { headers: { Accept: 'text/html' } })
+      assert.equal(missing.status, 404)
+      assert.equal((await missing.json()).error.code, 'NOT_FOUND')
+    }
+    assert.deepEqual(await (await fetch(`${origin}/api/health`)).json(), { data: { status: 'ok' } })
   } finally {
     await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()))
     await rm(dir, { recursive: true, force: true })

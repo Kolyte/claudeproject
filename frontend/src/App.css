@@ -18,8 +18,11 @@
 }
 
 .neo-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 72px; padding-block: 12px; flex-wrap: wrap; }
-.neo-nav { flex-wrap: wrap; }
+.neo-nav { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+.neo-nav .nav-link { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 .neo-nav .btn { white-space: nowrap; }
+.main { overflow-wrap: anywhere; }
+.project-header > div { min-width: 0; max-width: 100%; }
 .neo-skip { position: absolute; left: 12px; top: -100px; z-index: 20; padding: 12px; background: white; color: #1d3b53; }
 .neo-skip:focus { top: 12px; }
 .neo-auth { max-width: 640px; margin: 24px auto; }
@@ -51,6 +54,7 @@
   .neo-nav { gap: 8px; }
   .neo-nav .nav-link { padding-inline: 0; }
   .neo-form, .neo-form .field { min-width: 0; }
+  .neo-form .form-row { flex-direction: column; }
   .grid { grid-template-columns: minmax(0, 1fr); }
 }
 

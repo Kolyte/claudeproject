@@ -71,7 +71,7 @@ button:disabled { cursor: not-allowed; }
 .neo-project-card { padding: 24px; }
 .empty { padding: 32px 16px; }
 :focus-visible { outline: 3px solid var(--color-focus-on-dark); outline-offset: 4px; }
-.card :focus-visible, .disc-state :focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline-color: var(--color-focus-on-paper); }
+.card :focus-visible, .disc-state :focus-visible, .neo-pricing-plan :focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline-color: var(--color-focus-on-paper); }
 .neo-skip { background: var(--color-paper); color: var(--color-ink); }
 .disc-hero { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 64px; text-align: left; padding: 24px 0 56px; align-items: center; }
 .disc-eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .16em; color: var(--muted); margin-bottom: 24px; }

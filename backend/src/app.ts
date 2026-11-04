@@ -23,7 +23,7 @@ export function createApp(env: Env, frontendDir = fileURLToPath(new URL('../../f
     app.use(express.static(frontendDir, { index: false }))
     app.get('/{*page}', (req, res, next) => {
       if (req.path.startsWith('/assets/') || !req.accepts('html')) return next()
-      res.set('Cache-Control', 'no-cache').sendFile(resolve(frontendDir, 'index.html'))
+      res.set('Cache-Control', 'no-cache').sendFile('index.html', { root: frontendDir })
     })
   }
   app.use((_req, res) => { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found.' } }) })
