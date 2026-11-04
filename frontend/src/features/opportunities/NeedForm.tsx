@@ -3,6 +3,7 @@ import type { Compensation, Need, ParticipationType, WorkMode } from '@neo/contr
 import { Feedback, Field } from '../../components/ui/Feedback'
 import { ApiClientError, message, save } from '../../lib/api'
 import { compensationLabels, participationLabels, workModeLabels } from './labels'
+import { SkillInput, parseSkillList } from '../discovery'
 
 type NeedFields = Omit<Need, 'id' | 'projectId' | 'createdAt' | 'status'>
 
@@ -18,7 +19,8 @@ const blank: NeedFields = {
   compensation: 'unspecified',
 }
 
-const splitSkills = (value: string) => value.split(',').map(skill => skill.trim()).filter(Boolean)
+// Known spellings are canonicalised ("reactjs" -> "React") and case-insensitive duplicates removed.
+const splitSkills = parseSkillList
 
 function options<T extends string>(labels: Record<T, string>) {
   return (Object.entries(labels) as [T, string][]).map(([value, label]) => <option key={value} value={value}>{label}</option>)
@@ -54,8 +56,8 @@ export default function NeedForm({ projectId, existing, onSaved, onCancel }: { p
   return <form className="neo-form" onSubmit={submit}>
     <Field label="Opportunity title"><input required maxLength={120} value={fields.title} onChange={event => set('title', event.target.value)} />{fieldError('title')}</Field>
     <Field label="What help do you need?"><textarea required maxLength={5000} value={fields.description} onChange={event => set('description', event.target.value)} />{fieldError('description')}</Field>
-    <Field label="Required skills (comma separated)"><input value={required} onChange={event => setRequired(event.target.value)} />{fieldError('requiredSkills')}</Field>
-    <Field label="Desirable skills (comma separated)"><input value={desirable} onChange={event => setDesirable(event.target.value)} />{fieldError('desirableSkills')}</Field>
+    <div className="field"><SkillInput multiple label="Required skills (comma separated)" placeholder="e.g. React, PostgreSQL" value={required} onChange={setRequired} />{fieldError('requiredSkills')}</div>
+    <div className="field"><SkillInput multiple label="Desirable skills (comma separated)" placeholder="e.g. Figma, AI/ML" value={desirable} onChange={setDesirable} />{fieldError('desirableSkills')}</div>
     <div className="op-form-row">
       <Field label="Participation"><select value={fields.participationType} onChange={event => set('participationType', event.target.value as ParticipationType)}>{options(participationLabels)}</select></Field>
       <Field label="Hours per week"><input required type="number" min={1} max={80} step={1} value={fields.hoursPerWeek} onChange={event => set('hoursPerWeek', event.target.valueAsNumber)} />{fieldError('hoursPerWeek')}</Field>
