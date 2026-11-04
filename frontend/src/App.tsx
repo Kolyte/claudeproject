@@ -5,6 +5,7 @@ import { ProjectPage, NewProjectPage, EditProjectPage, MyProjectsPage } from './
 import { MyApplicationsPage, ReviewApplicationsPage } from './features/opportunities'
 import { LandingPage, ExplorePage } from './features/discovery/index.ts'
 import { Feedback } from './components/ui/Feedback'
+import { PricingPage } from './components/ui/PricingPage'
 import { message } from './lib/api'
 import bridgeLogo from './assets/north-east-origins-bridge.svg'
 import './App.css'
@@ -22,6 +23,7 @@ function Shell() {
     <header className="topbar"><div className="container neo-topbar">
       <Link to="/" className="brand"><img className="brand-logo" src={bridgeLogo} alt="" width="76" height="48" /> North East Origins</Link>
       <nav className="nav neo-nav" aria-label="Main navigation"><NavLink className="nav-link" to="/explore">Explore</NavLink>
+        <NavLink className="nav-link" to="/pricing">Plans &amp; pricing</NavLink>
         {session ? <><NavLink className="nav-link" to="/dashboard/projects">Your projects</NavLink><NavLink className="nav-link" to="/dashboard/applications">Applications</NavLink><NavLink className="nav-link" to="/profile">{profile?.displayName ?? 'Your profile'}</NavLink><button disabled={busy} className="btn btn-secondary btn-sm" onClick={logout}>Sign out</button></> : <><NavLink className="nav-link" to="/login">Sign in</NavLink><Link className="btn btn-primary btn-sm" to="/signup">Join</Link></>}
       </nav></div></header>
     <main className="container main" id="main"><Feedback error={error || authError} /><Outlet /></main>
@@ -32,6 +34,7 @@ function AppRoutes() {
   const { session } = useAuth()
   return <Routes key={session?.user.id ?? 'public'}><Route element={<Shell />}>
     <Route path="/login" element={<LoginPage />} /><Route path="/signup" element={<SignupPage />} />
+      <Route path="/pricing" element={<PricingPage />} />
       <Route index element={<LandingPage />} /><Route path="/explore" element={<ExplorePage />} />
       <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
       <Route path="/projects/new" element={<RequireAuth><NewProjectPage /></RequireAuth>} />
