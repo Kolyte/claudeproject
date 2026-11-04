@@ -77,7 +77,8 @@ test('real local Supabase: signup/confirmation, founder and contributor P0 journ
     const third = await account('Unrelated')
     await t.test('documented fictional seed runs against the real schema and is repeatable', async () => {
       const prepared = { founder: { id: founder.id, displayName: 'Founder' }, contributor: { id: contributor.id, displayName: 'Contributor' }, unrelated: { id: third.id, displayName: 'Unrelated' } }
-      const rows = buildDemoDataset(prepared)
+      // Disposable accounts get their own ID scope so a stack already seeded for the demo is untouched.
+      const rows = buildDemoDataset({ ...prepared, idScope: `p0-${run}` })
       const options = { db: supabaseRest({ url, key: serviceKey }), rows, accounts: prepared, skipProfiles: false, log: () => {} }
       await seed(options)
       await seed(options)
@@ -113,7 +114,13 @@ test('real local Supabase: signup/confirmation, founder and contributor P0 journ
       await request(`/needs/${need.id}/applications`, { token: founder.token, method: 'POST', body: { message: 'My own role' }, expected: 403 })
       await request(`/needs/${closed.id}/applications`, { token: contributor.token, method: 'POST', body: { message: 'Closed role' }, expected: 409 })
     })
-    browser = await chromium.launch({ channel: 'msedge', headless: true })
+    // Defaults to installed Microsoft Edge; NEO_BROWSER_CHANNEL=chromium uses Playwright's bundled Chromium,
+    // and NEO_BROWSER_PATH points at a specific Chromium binary (e.g. /opt/pw-browsers/chromium).
+    const channel = process.env.NEO_BROWSER_CHANNEL ?? 'msedge'
+    browser = await chromium.launch({
+      headless: true,
+      ...(process.env.NEO_BROWSER_PATH ? { executablePath: process.env.NEO_BROWSER_PATH } : channel === 'chromium' ? {} : { channel }),
+    })
     const founderContext = await browser.newContext({ viewport: { width: 1440, height: 1000 } })
     const contributorContext = await browser.newContext({ viewport: { width: 1440, height: 1000 } })
     const founderPage = await founderContext.newPage()

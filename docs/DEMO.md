@@ -78,6 +78,17 @@ E2E_UNRELATED_EMAIL=... E2E_UNRELATED_PASSWORD=... node --test tests/e2e/permiss
 - `discovery.browser.test.mjs` covers landing → explore hand-off, skill and location filters synced to the URL, deep-link refresh, no-results and retryable network-error states, and a 375px mobile viewport with no horizontal overflow.
 - `permissions.api.test.mjs` covers the acceptance list above at API level as anonymous, founder, contributor and unrelated users. That includes drafts, edits, needs/posts/milestones, discovery, applications, duplicates, closed needs, the review-summary shape and status transitions. It leaves records titled `[E2E fictional] …` behind. Direct RLS checks with the publishable key and the review-summary function are still manual steps for P1 and P5.
 
+The full local acceptance run uses P1's local stack (see `docs/P1-HANDOFF.md`), with all three suites pointed at it:
+
+- **Seed:** run `seed-demo.mjs --apply` against three confirmed local accounts.
+- **Browser suite:** `E2E_BASE_URL=http://127.0.0.1:5173`.
+- **Permission suite:** `E2E_BASE_URL=http://127.0.0.1:3001` plus the local URL, publishable key and account logins.
+- **P1's journey:** `node --env-file=.env.test --test tests/e2e/p0.test.mjs`.
+
+`p0.test.mjs` launches Microsoft Edge by default. Set `NEO_BROWSER_CHANNEL=chromium` for Playwright's bundled Chromium, or `NEO_BROWSER_PATH=<chrome binary>` for a specific binary. Its seed step uses a per-run ID scope, so it also passes on a stack already seeded for the demo. If the network blocks `ghcr.io` image layers, `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io npx supabase start …` pulls the same images from Docker Hub.
+
+A local pass is evidence for the code, not for the hosted release. The hosted seed, deployed URL and rehearsal are still recorded in the release issue.
+
 For development before the API exists, `VITE_DISCOVERY_SOURCE=fixtures npm --prefix frontend run dev` makes discovery read the fictional fixture behind a visible "fictional fixture data" banner. Never use it for the demo.
 
 ## Release record

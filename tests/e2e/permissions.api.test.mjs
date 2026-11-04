@@ -78,6 +78,7 @@ const needBody = (title) => ({
   workMode: 'remote',
   location: 'Newcastle',
   compensation: 'voluntary',
+  status: 'open',
 });
 
 describe('API journey and permissions', { skip, concurrency: false }, () => {
