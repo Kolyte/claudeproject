@@ -2,7 +2,9 @@
 
 ## What exists now
 
-The repository contains a React/Vite/TypeScript starter in `frontend/`, its own npm lockfile and two fictional fixture projects. The Express server, Supabase schema, shared contract package and hosting configuration are planned P1 tasks. The commands in this section work now; the application commands below become valid only after P1's scaffold lands.
+The repository contains the React/Vite frontend, Express API, type-only shared contracts, six-table Supabase schema with RLS, and one-service Render configuration. The active application uses Supabase-backed APIs. Fictional fixtures are preserved for isolated development and explicit seeding.
+
+The app is hosted at [north-east-origins.onrender.com](https://north-east-origins.onrender.com/). See [P1 issue #1](https://github.com/Kolyte/claudeproject/issues/1) for the verified release commit, provider setup and remaining hosted acceptance evidence. A reachable deployment alone does not complete the two-account acceptance journey.
 
 Use Node.js 24 (the coordination checker requires Node 22 or newer):
 
@@ -15,7 +17,7 @@ npm --prefix frontend run lint
 node --test scripts/coordination/check-ownership.test.mjs
 ```
 
-P1 installs backend/shared dependencies, adds the router/Supabase libraries, and owns all manifests/lockfiles. Preserve the existing separate frontend layout. No application dependency is needed for the coordination checker.
+P1 owns backend/shared dependencies, router/Supabase libraries and all manifests/lockfiles. Preserve the existing separate frontend layout. No application dependency is needed for the coordination checker.
 
 ## Kickoff access
 
@@ -23,12 +25,11 @@ P1 confirms access to a dedicated Supabase demo project, Render account, reposit
 
 Prepare two email/password demo accounts (founder and contributor) and a third unrelated account for permission tests. Use team-controlled addresses, confirm them before rehearsal, and store unique passwords privately. Registration/confirmation must still be exercised during acceptance; the rehearsed path uses already confirmed accounts to avoid inbox delays. GitHub login is not required for P0.
 
-## Planned application layout and commands
+## Application layout and commands
 
-P1 scaffolds `backend/` with Express/TypeScript, a type-only `shared/` package (`@neo/contracts`), the frontend router and common API client. Both app packages refer to the shared types using npm local file dependencies; there is no workspace conversion. Shared contracts have no runtime secrets or side effects. P1 provides these scripts before advertising the backend as runnable:
+`backend/` contains Express/TypeScript; `shared/` exports type-only `@neo/contracts`; the frontend has a router and common API client. Both app packages refer to the shared types using npm local file dependencies; there is no workspace conversion. Shared contracts have no runtime secrets or side effects.
 
 ```sh
-# After P1's scaffold PR lands:
 npm --prefix backend ci
 npm --prefix frontend ci
 npm --prefix backend run dev
@@ -41,11 +42,11 @@ npm --prefix frontend run build
 npm --prefix backend start
 ```
 
-Frontend dev remains on port 5173 and proxies `/api` to `http://localhost:3001`. Backend uses `PORT`, default 3001 locally. Production Express serves `/api` first, static files from `frontend/dist`, and the SPA fallback only for non-API page requests. Unknown API paths return JSON 404, not index.html. P1 adds `typecheck`, `lint`, `test`, `build`, `dev`, `start` scripts to the backend and documents which are meaningful before the first feature PR.
+Frontend dev remains on port 5173 and proxies `/api` to `http://localhost:3001`. Backend uses `PORT`, default 3001 locally. Production Express serves `/api` first, static files from `frontend/dist`, and the SPA fallback only for non-API page requests. Unknown API paths return JSON 404, not index.html. The backend provides `typecheck`, `lint`, `test`, `build`, `dev`, `start` and `smoke:production` scripts. Run the production smoke after building both packages; it verifies compiled routing without testing Supabase authentication.
 
 ## Environment contract
 
-P1 adds redacted `.env.example` files when the scaffold is built. Put real values in ignored `.env` files/provider settings. Frontend variables are public build inputs.
+Redacted `.env.example` files are provided in both app packages. Put real values in ignored `.env` files/provider settings. Frontend variables are public build inputs.
 
 | Variable | Location | Use |
 |---|---|---|
@@ -72,7 +73,7 @@ Initial data belongs only to the fictional demo project. A successful seed is no
 
 ## Render deployment
 
-P1 creates one Node web service connected to this repository, with the repository root as its working directory. Set Node.js 24 in hosting configuration. After the planned scaffold exists:
+Use one Node web service connected to this repository, with the repository root as its working directory. Set Node.js 24 in hosting configuration:
 
 - **Build command:** `npm --prefix backend ci && npm --prefix frontend ci && npm --prefix backend run build && npm --prefix frontend run build`.
 - **Start command:** `npm --prefix backend start`.
@@ -81,7 +82,7 @@ P1 creates one Node web service connected to this repository, with the repositor
 - Deploy approved main commits. P5 coordinates the final release, P1 operates hosting. Wait for a successful build/health result and test a deep SPA URL plus an API 404.
 - Verify auth redirects point to the real hostname and that refresh/login/application data survive a new browser session. Rehearse after the service is warm if the chosen hosting tier idles.
 
-This document specifies the deployment; it does not confirm one has been created. Record the URL and release commit in the release issue only after verification.
+`render.yaml` describes the intended configuration and disables automatic deploys. Direct MCP creation exposes fewer settings, so explicitly check `/api/health` is configured as the HTTP health-check path in Dashboard. Keep release commits, deployed settings and acceptance evidence in the task/release issue after verification.
 
 ## GitHub enforcement
 

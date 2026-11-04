@@ -1,0 +1,51 @@
+name: platform
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'shared/**'
+      - 'supabase/**'
+      - '.github/workflows/platform.yml'
+      - '.node-version'
+      - 'render.yaml'
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platform-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: platform / build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24'
+      - name: Install backend
+        run: npm --prefix backend ci --include=dev
+      - name: Install frontend
+        run: npm --prefix frontend ci --include=dev
+      - name: Build backend
+        run: npm --prefix backend run build
+      - name: Build frontend
+        run: npm --prefix frontend run build
+      - name: Test platform and PostgreSQL policies
+        run: npm --prefix backend test
+      - name: Smoke test compiled production server
+        run: npm --prefix backend run smoke:production
+      - name: Lint backend
+        run: npm --prefix backend run lint
+      - name: Lint frontend
+        run: npm --prefix frontend run lint

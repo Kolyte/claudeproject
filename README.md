@@ -2,9 +2,9 @@
 
 Discover what the North East is building. Find a project worth joining, or the people who can help build yours.
 
-North East Origins is a project-first collaboration platform for North East England. This repository contains an initial React/Vite starter, fictional project fixtures, the full product brief, and a coordination pack for five people building with coding agents.
+North East Origins is a project-first collaboration platform for North East England. This repository contains the React frontend, Express API, Supabase migrations, shared contracts, fictional development fixtures and the coordination pack for five people building with coding agents.
 
-**Current status:** planning and frontend starter. Authentication, the Express API, Supabase schema and deployment are still to be built. The coordination check is implemented; its GitHub enforcement requires repository settings.
+The P0 application is implemented and deployed at [north-east-origins.onrender.com](https://north-east-origins.onrender.com/), using hosted Supabase persistence. Current release evidence and outstanding hosted acceptance checks are tracked in [P1 issue #1](https://github.com/Kolyte/claudeproject/issues/1). GitHub enforcement still requires repository administrator settings.
 
 ## Start here
 
@@ -14,30 +14,34 @@ North East Origins is a project-first collaboration platform for North East Engl
 | [ROADMAP.md](ROADMAP.md) | Five work lanes, task IDs, dependencies, three-hour checkpoints and stretch goals |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | File ownership, separate checkouts, PRs and sequential integration |
 | [Agent instructions](AGENTS.md) | Rules every coding agent must follow |
+| [Design reference](docs/DESIGN.md) | Network Design Kit, P3 handoff and deferred website redesign |
 | [Contracts](docs/CONTRACTS.md) | API, data, component and permission agreements |
-| [Setup](docs/SETUP.md) | What runs now, planned backend setup, credentials and deployment |
+| [Setup](docs/SETUP.md) | Local development, credentials, migrations and deployment |
 | [Demo](docs/DEMO.md) | Fictional seed data, acceptance checklist and rehearsal script |
 
 ## Agreed stack
 
 - React + Vite + TypeScript in `frontend/`.
-- Express + Node.js + TypeScript in the planned `backend/`.
+- Express + Node.js + TypeScript in `backend/`.
 - Supabase PostgreSQL and Auth; user-scoped access and Row Level Security.
-- Shared types in the planned `shared/` directory.
+- Shared wire and generated database types in `shared/`.
 - One Render Node service serving `/api` and the compiled frontend.
 
-Keep the existing frontend in place. P1 owns dependency manifests and lockfiles, including the existing frontend lockfile. The coordination pack adds no application dependencies or workspace migration.
+P1 owns dependency manifests and lockfiles. Frontend and backend retain separate npm packages; both consume the type-only `@neo/contracts` local dependency.
 
-## Run the existing starter
+## Run locally
 
 Use Node.js 24 and npm. From the repository root:
 
 ```sh
+npm --prefix backend ci
 npm --prefix frontend ci
+npm --prefix backend run dev
+# In a second terminal:
 npm --prefix frontend run dev
 ```
 
-These commands currently launch the Vite starter, not a completed North East Origins application. See [setup](docs/SETUP.md) for the planned application commands.
+First copy each package's `.env.example` to its ignored `.env` and configure the same Supabase URL and publishable key. See [setup](docs/SETUP.md) for local Supabase and production commands. Public pages render without Auth configuration; account routes show a setup notice until configured.
 
 ## Check coordination
 
