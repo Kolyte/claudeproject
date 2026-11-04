@@ -1,0 +1,32 @@
+{
+  "name": "@neo/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --import tsx --watch src/index.ts",
+    "start": "node --env-file-if-exists=.env dist/index.js",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src",
+    "test": "tsx --test src/lib/*.test.ts"
+  },
+  "dependencies": {
+    "@neo/contracts": "file:../shared",
+    "@supabase/supabase-js": "^2.119.0",
+    "express": "^5.3.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.15",
+    "@playwright/test": "^1.64.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.19.2",
+    "oxlint": "^1.91.0",
+    "tsx": "^4.23.15",
+    "typescript": "~7.0.2"
+  }
+}
