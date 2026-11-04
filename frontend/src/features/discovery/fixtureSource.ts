@@ -3,6 +3,7 @@
 // shown with a "fictional fixture data" banner; it is never the live demo source.
 // Matching mirrors backend/src/features/discovery/service.ts.
 import type { Project as LegacyProject } from '../../../types';
+import { canonicalSkill } from './skills.ts';
 import type { DiscoveryFilters, Page, ProjectStage, ProjectSummary } from './types.ts';
 
 const STAGE_MAP: Record<string, ProjectStage> = {
@@ -20,7 +21,7 @@ const fold = (s: string) => s.trim().toLocaleLowerCase('en-GB');
 export function legacyToSummary(p: LegacyProject): ProjectSummary {
   const open = p.needs.filter((n) => n.status === 'Open');
   const skills = new Map<string, string>();
-  for (const n of open) for (const s of n.requiredSkills) if (!skills.has(fold(s))) skills.set(fold(s), s);
+  for (const n of open) for (const raw of n.requiredSkills) { const s = canonicalSkill(raw); if (!skills.has(fold(s))) skills.set(fold(s), s); }
   const dates = [
     ...p.posts.filter((post) => SUBSTANTIVE.has(post.type)).map((post) => post.date),
     ...p.milestones.map((m) => m.date),
@@ -51,7 +52,7 @@ export function queryFixtureSummaries(all: ProjectSummary[], f: DiscoveryFilters
       if (f.location && fold(s.location) !== fold(f.location)) return false;
       if (f.sector && fold(s.sector) !== fold(f.sector)) return false;
       if (f.stage && s.stage !== f.stage) return false;
-      if (f.skill && !s.requiredSkills.some((k) => fold(k) === fold(f.skill!))) return false;
+      if (f.skill && !s.requiredSkills.some((k) => fold(k) === fold(canonicalSkill(f.skill!)))) return false;
       return true;
     })
     .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));

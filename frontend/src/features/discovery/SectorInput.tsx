@@ -19,9 +19,9 @@ const MAX_SUGGESTIONS = 8;
 
 /**
  * Type-ahead for the fixed sector list (an ARIA 1.2 combobox). Typing "fi" suggests
- * Finance, Fintech, …; only listed sectors are accepted, so the form cannot submit free text.
+ * Finance, FinTech, …; only listed sectors are accepted, so the form cannot submit free text.
  */
-export default function SectorInput({ label, value, onChange, required, placeholder = 'Start typing, e.g. Fintech', className = '', id }: Props) {
+export default function SectorInput({ label, value, onChange, required, placeholder = 'Start typing, e.g. FinTech', className = '', id }: Props) {
   const autoId = useId();
   const inputId = id ?? `sector-${autoId}`;
   const listId = `${inputId}-list`;

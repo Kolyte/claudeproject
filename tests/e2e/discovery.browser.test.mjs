@@ -98,10 +98,10 @@ describe('discovery UI', { skip }, () => {
     const options = list.getByRole('option');
     await options.first().waitFor();
     const names = await options.allInnerTexts();
-    assert.ok(names.includes('Finance') && names.includes('Fintech'), `suggestions were ${names.join(', ')}`);
-    await list.getByRole('option', { name: 'Fintech' }).click();
-    await page.waitForURL((u) => new URL(u).searchParams.get('sector') === 'Fintech');
-    assert.equal(await box.inputValue(), 'Fintech');
+    assert.ok(names.includes('Finance') && names.includes('FinTech'), `suggestions were ${names.join(', ')}`);
+    await list.getByRole('option', { name: 'FinTech' }).click();
+    await page.waitForURL((u) => new URL(u).searchParams.get('sector') === 'FinTech');
+    assert.equal(await box.inputValue(), 'FinTech');
     await settled(page);
 
     await box.fill('');
@@ -146,6 +146,35 @@ describe('discovery UI', { skip }, () => {
     await page.close();
   });
 
+  test('skill type-ahead suggests known skills and tidies variant spellings', async () => {
+    const page = await browser.newPage();
+    await page.goto(`${BASE}/explore`);
+    await settled(page);
+    const box = page.getByRole('combobox', { name: 'Skill needed' });
+    await box.fill('post');
+    const list = page.getByRole('listbox', { name: 'Skill needed suggestions' });
+    await list.getByRole('option', { name: 'PostgreSQL' }).click();
+    await page.waitForURL((u) => new URL(u).searchParams.get('skill') === 'PostgreSQL');
+    assert.equal(await box.inputValue(), 'PostgreSQL');
+
+    await box.fill('reactjs');
+    await box.blur();
+    assert.equal(await box.inputValue(), 'React', 'variant spelling tidied on blur');
+    await page.waitForURL((u) => new URL(u).searchParams.get('skill') === 'React');
+    await settled(page);
+
+    await box.fill('ty');
+    await list.waitFor();
+    const low = await list.evaluate((ul) => {
+      const rgb = (s) => (s.match(/[\d.]+/g) || []).map(Number);
+      const lum = (c) => { const f = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+      const bg = (el) => { for (let e = el; e; e = e.parentElement) { const c = rgb(getComputedStyle(e).backgroundColor); if (c.length === 3 || c[3] > 0.5) return c; } return [255, 255, 255]; };
+      return [...ul.querySelectorAll('[role=option]')].map((li) => { const a = lum(rgb(getComputedStyle(li).color)), b = lum(bg(li)); return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05); }).filter((r) => r < 4.5);
+    });
+    assert.deepEqual(low, [], 'skill suggestions are readable');
+    await page.close();
+  });
+
   test('no-results state offers a way back', async () => {
     const page = await browser.newPage();
     await page.goto(`${BASE}/explore?skill=zz-no-such-skill-e2e`);
@@ -183,7 +212,7 @@ describe('discovery UI', { skip }, () => {
     const page = await browser.newPage({ viewport: { width: 320, height: 640 } });
     const long = 'X'.repeat(120);
     const project = {
-      id: '00000000-0000-4000-8000-0000000000aa', title: long, pitch: 'P'.repeat(300), sector: 'Fintech',
+      id: '00000000-0000-4000-8000-0000000000aa', title: long, pitch: 'P'.repeat(300), sector: 'FinTech',
       location: 'L'.repeat(120), stage: 'idea', status: 'active', ownerDisplayName: 'O'.repeat(120),
       requiredSkills: ['S'.repeat(60)], openNeedsCount: 1, lastSubstantiveUpdateAt: null, createdAt: new Date().toISOString(),
     };

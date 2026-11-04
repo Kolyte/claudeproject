@@ -57,7 +57,7 @@ const ok = (q: Record<string, unknown>) => {
 };
 
 test('sector filter accepts listed sectors in any case and normalises them', () => {
-  assert.deepEqual(ok({ sector: ' fintech ' }), { sector: 'Fintech', limit: 20, offset: 0 });
+  assert.deepEqual(ok({ sector: ' fintech ' }), { sector: 'FinTech', limit: 20, offset: 0 });
   assert.deepEqual(ok({ sector: 'MACHINE LEARNING' }), { sector: 'Machine Learning', limit: 20, offset: 0 });
 });
 
@@ -99,6 +99,14 @@ test('filters combine with AND and are case-insensitive', () => {
   assert.deepEqual(applyDiscovery(rows, ok({ stage: 'idea' })).data.map((p) => p.id), ['c']);
   assert.deepEqual(applyDiscovery(rows, ok({ sector: 'education' })).data.map((p) => p.id), ['d']);
   assert.deepEqual(applyDiscovery(rows, ok({ location: 'Newcastle Helix' })).data, [], 'location is exact');
+});
+
+test('skill matching uses canonical names: ReactJS, react.js and React are one skill', () => {
+  const aliased = [row({ id: 'z', project_needs: [{ status: 'open', required_skills: ['ReactJS', 'postgres', 'react'] }] })];
+  const page = applyDiscovery(aliased, ok({ skill: 'react.js' }));
+  assert.deepEqual(page.data.map((p) => p.id), ['z']);
+  assert.deepEqual(page.data[0].requiredSkills, ['React', 'PostgreSQL']);
+  assert.equal(applyDiscovery(aliased, ok({ skill: 'PostgreSQL' })).data.length, 1);
 });
 
 test('pagination keeps the total', () => {

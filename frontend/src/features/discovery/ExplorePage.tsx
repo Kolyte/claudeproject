@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import DiscoveryResults from './DiscoveryResults.tsx';
 import FixtureNotice from './FixtureNotice.tsx';
 import SectorInput from './SectorInput.tsx';
+import SkillInput from './SkillInput.tsx';
 import {
   FILTER_KEYS,
   NORTH_EAST_LOCATIONS,
@@ -67,12 +68,6 @@ export default function ExplorePage() {
     });
   };
 
-  // Suggest skills already visible in results; typing any other skill still works.
-  const skillSuggestions = useMemo(
-    () => (state.status === 'ready' ? [...new Set(state.items.flatMap((p) => p.requiredSkills))].sort() : []),
-    [state],
-  );
-
   const filtered = hasActiveFilters(filters);
 
   return (
@@ -109,22 +104,14 @@ export default function ExplorePage() {
             )}
           </select>
         </label>
-        <label className="disc-field">
-          <span>Skill needed</span>
-          <input
-            type="text"
-            list="disc-skill-options"
-            placeholder="e.g. React"
-            value={skill}
-            maxLength={60}
-            onChange={(e) => setSkill(e.target.value)}
-          />
-          <datalist id="disc-skill-options">
-            {skillSuggestions.map((s) => (
-              <option key={s} value={s} />
-            ))}
-          </datalist>
-        </label>
+        <SkillInput
+          label="Skill needed"
+          className="disc-field"
+          placeholder="e.g. React"
+          value={skill}
+          maxLength={60}
+          onChange={setSkill}
+        />
         <SectorInput
           label="Sector"
           className="disc-field"
