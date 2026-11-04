@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "sharedOwner": "p1",
+  "sharedBasenames": ["package.json", "package-lock.json", "npm-shrinkwrap.json", "yarn.lock", "pnpm-lock.yaml", "bun.lock", "bun.lockb"],
+  "lanes": {
+    "p1": {
+      "name": "Platform and identity",
+      "branchPrefix": "p1/",
+      "files": [
+        "README.md", "project brief.md", "FirstReadme", "ROADMAP.md", "CONTRIBUTING.md", "AGENTS.md", "CLAUDE.md",
+        ".gitignore", ".gitattributes", ".oxlintrc.json", ".node-version", ".nvmrc", ".env.example",
+        "package.json", "package-lock.json", "render.yaml",
+        "frontend/package.json", "frontend/package-lock.json", "frontend/index.html", "frontend/.env.example",
+        "frontend/vite.config.ts", "frontend/tsconfig.json", "frontend/tsconfig.app.json", "frontend/tsconfig.node.json",
+        "frontend/src/App.tsx", "frontend/src/App.css", "frontend/src/main.tsx", "frontend/src/index.css", "frontend/src/vite-env.d.ts",
+        "backend/package.json", "backend/package-lock.json", "backend/tsconfig.json", "backend/.env.example",
+        "backend/src/index.ts", "backend/src/app.ts", "backend/src/routes.ts", "backend/src/env.ts"
+      ],
+      "prefixes": [
+        ".github/", "coordination/", "scripts/coordination/", "docs/", "shared/", "supabase/",
+        "frontend/public/", "frontend/src/assets/", "frontend/src/lib/", "frontend/src/components/ui/", "frontend/src/features/auth/",
+        "backend/src/lib/", "backend/src/middleware/", "backend/src/features/identity/"
+      ]
+    },
+    "p2": {
+      "name": "Projects",
+      "branchPrefix": "p2/",
+      "files": [],
+      "prefixes": ["frontend/src/features/projects/", "backend/src/features/projects/"]
+    },
+    "p3": {
+      "name": "Progress",
+      "branchPrefix": "p3/",
+      "files": [],
+      "prefixes": ["frontend/src/features/activity/", "backend/src/features/activity/"]
+    },
+    "p4": {
+      "name": "Opportunities",
+      "branchPrefix": "p4/",
+      "files": [],
+      "prefixes": ["frontend/src/features/opportunities/", "backend/src/features/opportunities/"]
+    },
+    "p5": {
+      "name": "Discovery and integration",
+      "branchPrefix": "p5/",
+      "files": ["docs/DEMO.md", "scripts/seed-demo.mjs"],
+      "prefixes": ["frontend/src/features/discovery/", "backend/src/features/discovery/", "frontend/src/data/", "fixtures/", "tests/e2e/"]
+    }
+  }
+}
