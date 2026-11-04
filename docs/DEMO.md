@@ -97,6 +97,20 @@ The full local acceptance run uses P1's local stack (see `docs/P1-HANDOFF.md`), 
 
 The ignored `.env.test` must set local `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEO_API_URL`, `NEO_UI_URL` and `NEO_MAILPIT_URL`. Local defaults are API 55421, Express 3001, Vite 5173 and Mailpit 54324. The P0 suite creates/removes isolated test accounts and refuses remote targets; do not use it to test a hosted release. P5's permissions suite is the deployed-target check and intentionally retains fictional records.
 
+For a repeatable local run, start the UI/API built with the same local Supabase settings and the confirmation-enabled local Supabase/Mailpit stack, then run:
+
+```sh
+node --env-file=.env.test tests/e2e/local-acceptance.mjs
+```
+
+This runner prepares three disposable confirmed accounts and an isolated fictional seed, runs P0, discovery, API permissions, mobile forms, direct RLS and visual suites sequentially, then removes its projects/accounts and verifies cleanup. The mobile forms suite separately creates and removes its signup account. The runner requires loopback targets, rejects redirects during administrative setup, and fails if a suite skips or has no tests. Existing package dependencies and browser executables must be available. Select individual suites by appending filenames, for example `forms.browser.test.mjs rls.api.test.mjs`.
+
+`forms.browser.test.mjs` exercises signup/confirmation, profile editing and sign-out, project draft/publish forms, progress/milestones, opportunity add/edit/close, contributor application and founder review at 375px, plus persistence after signing in from a fresh browser context. `rls.api.test.mjs` uses caller tokens directly against the local Data API and review-summary RPC to check draft-child privacy, nonowner writes, immutable ownership, private profiles and application access. Administrative credentials are withheld from the discovery, permissions and RLS child processes.
+
+`visual.browser.test.mjs` captures public and authenticated pages at 320, 375, 768 and 1440px for visual review. It checks overflow, usable mobile field widths, sector suggestion text contrast, keyboard focus contrast on paper, desktop card layout, loading/error/empty states, 200% text size and maximum-length profile/project text. Screenshots and measured observations live under `test-results/visual/after/`; set `E2E_VISUAL_PHASE=before` to keep a separate before set. These screenshots support manual review; the suite does not claim pixel-baseline comparison or complete accessibility certification. The visual child process also receives no administrative credential.
+
+Reports, individual suite logs and screenshots are written to ignored `tests/e2e/test-results/`. A forcibly interrupted child suite may leave its own disposable accounts and requires cleanup verification; local Mailpit messages remain. Local results do not establish hosted acceptance.
+
 `p0.test.mjs` launches Microsoft Edge by default. Set `NEO_BROWSER_CHANNEL=chromium` for Playwright's bundled Chromium, or `NEO_BROWSER_PATH=<chrome binary>` for a specific binary. Its seed step uses a per-run ID scope, so it also passes on a stack already seeded for the demo. If the network blocks `ghcr.io` image layers, `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io npx supabase start …` pulls the same images from Docker Hub.
 
 A local pass is evidence for the code, not for the hosted release. PR #14 records local permissions API 14/14, P0 journey 7/7 and discovery browser 7/7, with both builds/lints and backend checks. PR #15 records the expanded discovery browser suite at 8/8, including maximum-length text and heading checks at 320px. These are recorded historical results, not reruns during this documentation refresh. The hosted seed, exact deployed commit and rehearsal still require release evidence. Public HTTP smoke during the refresh returned health/discovery 200, anonymous me 401 and unknown API 404; it does not replace that work.

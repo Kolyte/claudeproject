@@ -45,6 +45,7 @@
   color: var(--primary);
 }
 .disc-place:hover { border-color: var(--primary); }
+.disc-ticket-link:focus-visible { outline-color: var(--color-focus-on-paper); }
 
 .disc-section { margin-top: 32px; }
 .disc-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
@@ -90,6 +91,7 @@
 
 /* Card */
 .disc-grid { grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
+.disc-landing .disc-grid { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
 .disc-card { display: flex; flex-direction: column; min-width: 0; text-decoration: none; color: inherit; overflow: hidden; }
 .disc-card:hover { border-color: var(--primary); }
 .disc-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
