@@ -1,5 +1,6 @@
 // Validation of GET /api/discover/projects query parameters (docs/CONTRACTS.md).
 // Pure and dependency-free so it can be unit-tested with `node --test`.
+import { canonicalSector } from './sectors.ts';
 import type { DiscoveryFilters, ProjectStage } from './types.ts';
 
 const STAGES: readonly string[] = ['idea', 'prototype', 'mvp', 'launched'];
@@ -33,7 +34,11 @@ export function parseDiscoveryFilters(query: RawQuery): FilterResult {
     const value = single(key);
     if (value === undefined || value === '') continue;
     if (value.length > TEXT_LIMITS[key]) fields[key] = `Must be ${TEXT_LIMITS[key]} characters or fewer.`;
-    else filters[key] = value;
+    else if (key === 'sector') {
+      const sector = canonicalSector(value);
+      if (sector) filters.sector = sector;
+      else fields.sector = 'Must be one of the listed sectors.';
+    } else filters[key] = value;
   }
 
   const stage = single('stage');
