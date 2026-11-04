@@ -1,0 +1,217 @@
+NETWORK INSPIRED PRODUCT DESIGN SYSTEM
+
+Purpose
+
+Apply the portfolio's visual language to an unrelated product. Preserve the
+editorial discipline and visual hierarchy, not the career narrative or train
+simulation. The result should feel like a carefully typeset transport atlas
+combined with a useful contemporary tool: precise, calm and slightly tactile.
+
+1. Design principles
+
+Use a dark ink canvas as context, and warm paper as the reading surface.
+Keep one clear focal panel. Colour identifies a stable category or path rather
+than decorating every element. Give data a consistent alignment and labels a
+clear hierarchy. Let rules, spacing and typography do most of the work.
+
+Avoid glossy gradients, luminous glows, glassmorphism, oversized pills,
+generic rounded dashboard cards and gratuitous animation. Do not replace
+useful product structure with a metaphor simply because the reference has one.
+
+2. Palette
+
+Canvas                 #141b1d
+Dark reading ink       #172331
+Warm ticket paper      #eeecdf
+Raised navigator paper #f4f1e7
+Ticket band            #dcdacc
+Text on canvas         #ecebdf
+Muted text on canvas   #97a6a4
+Muted text on paper    #526171
+Green category         #00792c
+Blue category          #0098d4
+Yellow category        #ffd300
+Paper focus ring       #003888
+Dark focus ring        #e66c57
+
+These colours come from the reference implementation. Blue and yellow badges
+use dark ink; green badges use light text. Do not use yellow or bright blue as
+small reading text on paper. The semantic tokens in tokens.css distinguish
+surfaces, text, categories and focus colours so a new project can retheme them.
+The colours alone do not certify contrast compliance for every use.
+
+3. Typography
+
+Headings: Space Grotesk, regular 400; medium 500 for selected UI headings.
+Body and interface: DM Sans, regular 400, medium 500 and semibold 600.
+Included fonts are Latin normal subsets. Add properly licensed language
+coverage if the next product requires it; never silently drop non-Latin text.
+
+Suggested reading scale for the new project:
+Display      48-72px, line-height 1.02-1.08, tracking about -0.04em
+Page title   32-40px, line-height 1.1, tracking about -0.035em
+Section      24-28px, line-height 1.18
+Card title   20-24px, line-height 1.2
+Body         14-16px, line-height 1.6-1.75
+Label        12-13px, line-height 1.4
+Eyebrow      11-12px, uppercase, tracking 0.12-0.16em
+
+This is an adapted scale. The portfolio's map has smaller geographic labels;
+do not copy those sizes into important product instructions or form fields.
+Use mixed case for normal navigation. Keep headings short and concrete.
+Do not use em dashes in interface copy.
+
+4. Spacing and composition
+
+Use 4, 8, 12, 16, 24, 32, 48 and 64px spacing steps. This regularises the
+reference's spacing rather than reproducing every existing CSS value.
+Centre desktop content within 1440px. Use 32-48px desktop side gutters,
+20-24px tablet gutters and 16-20px mobile gutters. Align panel edges and
+column starts rather than centring every individual text block.
+
+For a spatial workspace, reserve a calm dark canvas and one 350-400px paper
+detail panel. For a conventional website, use dark section backgrounds and
+paper content blocks in normal document flow instead of a full-screen map.
+Do not inherit the portfolio's long scroll track or fixed-camera mechanics.
+
+Use mostly square cards, 1px rules, 2px badge corners, and an occasional
+18px rounded floating navigation dock. Radius should distinguish component
+roles, not make the entire interface look soft. A restrained offset shadow
+can lift a ticket; it should not compete with the category colour.
+
+5. Component recipes
+
+Application header
+Use a compact typographic wordmark, subtle bottom rule and a few labelled
+destinations. Small square letter badges identify categories. Use a new
+project name and original mark. Do not reuse a personal photo or TfL roundel.
+
+Paper ticket or detail panel
+Warm paper background, dark text, square corners. Start with a 5px category
+stripe and a muted identity band. Then show an eyebrow, title, short summary
+and structured facts. Separate actions using a dashed perforation-style rule.
+Use 24-28px internal padding on desktop and 16-20px on compact screens.
+
+Category badge
+A 19-24px visual square with a short letter or glyph, plus a readable text
+label. Embed it inside a larger 44px minimum interaction area when clickable.
+Never rely on badge colour or a letter alone to communicate an unfamiliar
+category. Keep category meanings consistent across the entire product.
+
+Buttons and links
+Use a dark-ink primary action on paper with light text and a directional
+arrow where it genuinely communicates navigation. Secondary actions are
+quiet text links or thin bordered controls. Keep labels explicit. Supply
+visible focus, hover, pressed, disabled, loading and error states.
+Never remove a native focus outline without a visible replacement.
+
+Fact rows and tags
+Align short labels and values in repeated rows with fine rules. Tags have
+small square corners and a thin ink border. Do not make every fact a chip.
+Use actual text for status, not just a green circle.
+
+Map or relationship diagram, only when useful
+Use horizontal, vertical and 45-degree segments with softened bends. Main
+routes are 9px over a 15px dark casing; subordinate lines are quieter.
+Provide white or paper station rings against the dark canvas and keep all
+labels horizontal. Keep background geometry low contrast, but readable
+interactive labels high contrast. Routes must express real relationships.
+Do not draw invented relationships solely to fill empty space.
+
+Bottom navigator, optional
+Use an ivory dock with category key, current-location text and compact
+schematic. On desktop the source budget is 144px with an 18px rounded dock;
+the source mobile budget is 152px and short-landscape budget is 92px.
+Treat those as starting points, not hard limits for new content.
+While moving, show the ringed dot. At a shared node, fade its centre to dark
+ink and fade the moving dot out over 300ms; reverse on departure. The origin
+also counts as selected at the beginning and end of a circuit. Provide a
+textual selected state and aria-current. Do not add a separate progress bar.
+For a non-spatial product, use ordinary tabs or a sidebar instead.
+
+6. Motion and behaviour
+
+Use approximately 160ms feedback, 300ms selection fades and up to 450ms panel
+entrances. Animate opacity and short, purposeful translations. Do not animate
+layout dimensions unnecessarily or let controls drift while someone clicks.
+Keep camera travel and trains out of the new product unless its real workflow
+needs them. If trains are used, they stay on independent tracks, advance
+forward and meet aligned at a platform; never overlap or change rails for a
+visual effect. Incoming arrivals begin only after the main arrival settles.
+
+Respect prefers-reduced-motion with immediate states and static diagrams.
+Provide a pause control for any continuing ambient motion. Never make an
+animation a prerequisite for reading, navigation or task completion.
+
+7. Responsive behaviour
+
+At wide desktop widths, a diagram and ticket may sit side by side. Below
+roughly 1100px, reduce secondary labels and avoid squeezed columns. Below
+760px, stack the primary content, use a compact header, and let text reflow.
+A paper panel may become an inline card or properly accessible bottom sheet.
+At short heights, avoid trapping the user between fixed header and footer.
+
+Never scale an entire desktop screen down to fit a phone. Preserve full
+labels in an accessible list if a diagram cannot fit them. Keep controls at
+least 44px high where practical. At 200% text zoom, allow the page to grow
+instead of clipping or forcing a fixed-height composition. Keep focused
+elements visible above sticky navigation.
+
+8. Accessibility
+
+Use semantic header, nav, main, section and button elements. A diagram must
+have a meaningful text equivalent; a decorative map should be aria-hidden.
+Indicate selection with shape, weight or text in addition to colour. Aim for
+WCAG AA contrast: at least 4.5:1 for normal text, 3:1 for large text, and
+3:1 for required non-text UI boundaries and states against adjacent colours.
+Check actual rendered pairings, not just palette swatches. These targets
+are acceptance criteria, not a claim that every possible combination passes.
+
+Test keyboard-only use, visible focus, screen-reader names, reduced motion,
+mobile touch, zoom, long headings, empty data, loading and errors. Preserve
+native cursors in a utility product; the portfolio's decorative cursor is
+not part of this core system.
+
+9. Unrelated example
+
+The visual document uses Fieldwork, a fictional project-planning workspace.
+Green means Plan, blue means Make, and yellow means Review. The main paper
+ticket shows a workshop task rather than a CV entry. Diagram nodes represent
+work stages, not employers or education. This demonstrates visual transfer
+without requiring transport terminology, skill passengers or a career story.
+All example status and timing values are illustrative, not live data.
+
+10. Implementation handoff
+
+Read tokens.css first. Import it before application styles and keep its font
+files together, or update their relative URLs. Use semantic colour tokens
+inside reusable components. Replace the example brand and labels with the
+new brief. Keep content data independent from layout and animation.
+
+Framework, routing, hosting, analytics and application data are intentionally
+not prescribed. The kit has no build dependencies, trackers or external
+requests. index.html and guide.css are a visual reference, not an application
+shell or a working project-management product.
+
+Suggested brief for a coding agent:
+
+Build the new project using the accompanying Network Design Kit. Preserve
+the dark ink canvas, warm paper panels, Space Grotesk headings, DM Sans
+reading text, green/blue/yellow category accents, fine rules, compact square
+badges and restrained motion. Use DESIGN-SPEC.txt and tokens.css as the
+design contract. Replace all example content with the actual project brief.
+Do not reproduce the portfolio, personal content, trains, career timeline
+or map navigation unless that interaction genuinely fits the new product.
+Prioritise responsive reading, clear task flows and accessible controls.
+
+Acceptance checklist
+
+[ ] The new project is identifiable without reference to the portfolio.
+[ ] Category colours have stable, labelled meanings.
+[ ] Reading surfaces, typography and borders follow the tokens.
+[ ] Actual content fits desktop, 390px mobile and short landscape layouts.
+[ ] Focus, selection and errors are understandable without colour.
+[ ] 200% text zoom and reduced motion remain usable.
+[ ] No personal portfolio data or private assets have been carried across.
+[ ] Font licenses remain included when fonts are redistributed.
+[ ] There are no em dashes or unnecessary animation in the interface copy.
