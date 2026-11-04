@@ -13,7 +13,7 @@
         "frontend/package.json", "frontend/package-lock.json", "frontend/index.html", "frontend/.env.example",
         "frontend/vite.config.ts", "frontend/tsconfig.json", "frontend/tsconfig.app.json", "frontend/tsconfig.node.json",
         "frontend/src/App.tsx", "frontend/src/App.css", "frontend/src/main.tsx", "frontend/src/index.css", "frontend/src/vite-env.d.ts",
-        "frontend/src/components/Layout.tsx", "frontend/src/state/ProjectsContext.tsx", "frontend/src/types.ts",
+        "frontend/src/components/Layout.tsx", "frontend/src/state/ProjectsContext.tsx", "frontend/src/types.ts", "frontend/types.ts",
         "backend/package.json", "backend/package-lock.json", "backend/tsconfig.json", "backend/.env.example",
         "backend/src/index.ts", "backend/src/app.ts", "backend/src/routes.ts", "backend/src/env.ts"
       ],
