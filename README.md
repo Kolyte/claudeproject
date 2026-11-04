@@ -41,7 +41,7 @@ npm --prefix backend run dev
 npm --prefix frontend run dev
 ```
 
-First copy each package's `.env.example` to its ignored `.env` and configure the same Supabase URL and publishable key. See [setup](docs/SETUP.md) for local Supabase and production commands. Public pages render without Auth configuration; account routes show a setup notice until configured.
+The checked-in `backend/.env` and `frontend/.env` contain the shared hosted demo URL and publishable key, so both packages connect to the same database immediately. `.env.example` files describe the variables for another environment. See [setup](docs/SETUP.md) for local Supabase and production commands. Public pages render without Auth configuration; account routes show a setup notice until configured.
 
 ## Check coordination
 

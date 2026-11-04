@@ -14,10 +14,12 @@ test-results/
 playwright-report/
 *.local
 
-# Local application and seeding credentials
+# Track shared public app configuration; keep other environment files ignored.
 .env
 .env.*
 !.env.example
+!backend/.env
+!frontend/.env
 
 # Editor directories and files
 .vscode/*
