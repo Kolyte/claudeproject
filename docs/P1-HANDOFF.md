@@ -14,7 +14,7 @@ The product scope, permissions and wire contracts remain defined by `ROADMAP.md`
 
 Use Node 24. There is no workspace conversion. Run `npm --prefix backend ci` and `npm --prefix frontend ci` from the repository root.
 
-Copy `backend/.env.example` and `frontend/.env.example` to ignored `.env` files and use the same Supabase URL and publishable key. Never use a service-role key in either app. Run `npm --prefix backend run dev` and `npm --prefix frontend run dev` in separate terminals. Vite proxies `/api` to port 3001. Without frontend Supabase configuration, public landing/discovery pages still render and account routes show a setup notice. Health remains available; data APIs do not fake success.
+The checked-in `backend/.env` and `frontend/.env` connect both packages to the shared hosted demo with its public publishable key. Use `.env.example` as the variable reference when configuring another environment. Never use a service-role key in either app. Run `npm --prefix backend run dev` and `npm --prefix frontend run dev` in separate terminals. Vite proxies `/api` to port 3001. Without frontend Supabase configuration, public landing/discovery pages still render and account routes show a setup notice. Health remains available; data APIs do not fake success.
 
 For the dedicated local stack, run `npx supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor`. Local API and database ports are 55421 and 55422. Email confirmation is enabled; local mail is captured by Mailpit. Ordered migrations run on initial local startup. Do not apply to a hosted project until its target/access are confirmed.
 
