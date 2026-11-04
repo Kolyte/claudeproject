@@ -1,5 +1,6 @@
 import type { Profile, ProfilePatch } from '@neo/contracts'
 import { HttpError } from '../../lib/errors.js'
+import { canonicalSkills } from '../discovery/skills.js'
 
 export function parseProfilePatch(input: unknown): ProfilePatch {
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw new HttpError(400, 'VALIDATION_ERROR', 'Send a profile object.')
@@ -22,7 +23,7 @@ export function parseProfilePatch(input: unknown): ProfilePatch {
       const options = key === 'participationTypes' ? ['cofounder', 'contributor', 'task', 'mentor'] : key === 'workModes' ? ['local', 'remote', 'hybrid'] : null
       if (!Array.isArray(value) || value.length > 30 || value.some(v => typeof v !== 'string' || !v.trim() || v.trim().length > 60 || (options && !options.includes(v.trim())))) {
         fields[key] = options ? 'Choose valid options.' : 'Use up to 30 entries of 1–60 characters.'
-      } else result[key] = [...new Set(value.map(v => v.trim()))]
+      } else result[key] = key === 'declaredSkills' ? canonicalSkills(value) : [...new Set(value.map(v => v.trim()))]
     }
   }
   if (Object.keys(fields).length) throw new HttpError(400, 'VALIDATION_ERROR', 'Check your profile details.', fields)

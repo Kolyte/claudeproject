@@ -1,10 +1,12 @@
 import { z } from 'zod'
+import { canonicalSkills } from '../features/discovery/skills.js'
 import type { Request } from 'express'
 import { HttpError } from './errors.js'
 
 export const shortText = z.string().trim().min(1).max(120)
 export const longText = z.string().trim().min(1).max(5000)
-export const skills = z.array(z.string().trim().min(1).max(60)).max(30).transform(value => [...new Set(value)])
+// Known spellings become canonical ("reactjs" -> "React"); duplicates are removed case-insensitively.
+export const skills = z.array(z.string().trim().min(1).max(60)).max(30).transform(value => canonicalSkills(value))
 export const stage = z.enum(['idea', 'prototype', 'mvp', 'launched'])
 export function parse<T>(schema: z.ZodType<T>, value: unknown): T {
   const result = schema.safeParse(value)
