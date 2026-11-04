@@ -6,10 +6,21 @@ import { camel, longText, nonempty, pagination, parse, shortText, snake, stage }
 import { visibleProject } from '../../lib/projects.js'
 import { databaseError } from '../../lib/supabase.js'
 import type { Project } from '@neo/contracts'
+import { canonicalSector } from '../discovery/sectors.js'
+
+/** Sector must be one of the fixed list; case is normalised to the canonical name. */
+const sector = z.string().trim().transform((value, ctx) => {
+  const canonical = canonicalSector(value)
+  if (!canonical) {
+    ctx.addIssue({ code: 'custom', message: 'Choose a sector from the list.' })
+    return z.NEVER
+  }
+  return canonical
+})
 
 const editable = z.strictObject({
   title: shortText, pitch: z.string().trim().min(1).max(300), problem: longText, solution: longText,
-  sector: shortText, location: shortText, stage,
+  sector, location: shortText, stage,
   status: z.enum(['active', 'paused', 'completed']), visibility: z.enum(['draft', 'public']),
 })
 export function projectsRouter(env?: Env) {
