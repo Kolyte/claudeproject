@@ -2,7 +2,7 @@
 
 **Owner: P5. Reviewed 4 November 2026.** Seed and acceptance suites are implemented. Local Supabase acceptance passes are recorded in PR #14, while issue #1 records hosted Auth, database-policy and public-route checks. A complete hosted seed → multi-account journey → mobile rehearsal has no recorded pass in the evidence reviewed. Record actual runs and release status in the task/release issue. The final demo uses Supabase; a fixture module or skipped suite does not satisfy P0.
 
-The approved redesign, bridge logo, P4 opportunities and fixed-sector PRs #13/#14 are integrated on main. Preserve that design and verify the exact deployed commit before rehearsal. The last deployment recorded in [issue #1](https://github.com/Kolyte/claudeproject/issues/1) is `025a5d8098066e443e49fc129517b599ac3e556a`, before these later changes; a healthy URL alone cannot confirm their deployment.
+The approved redesign, bridge logo, P4 opportunities, fixed-sector PRs #13/#14 and discovery-card QA fixes in #15 are integrated on main. Preserve that design and verify the exact deployed commit before rehearsal. The last deployment recorded in [issue #1](https://github.com/Kolyte/claudeproject/issues/1) is `025a5d8098066e443e49fc129517b599ac3e556a`, before these later changes; a healthy URL alone cannot confirm their deployment.
 
 ## Fictional examples
 
@@ -99,7 +99,7 @@ The ignored `.env.test` must set local `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY
 
 `p0.test.mjs` launches Microsoft Edge by default. Set `NEO_BROWSER_CHANNEL=chromium` for Playwright's bundled Chromium, or `NEO_BROWSER_PATH=<chrome binary>` for a specific binary. Its seed step uses a per-run ID scope, so it also passes on a stack already seeded for the demo. If the network blocks `ghcr.io` image layers, `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io npx supabase start …` pulls the same images from Docker Hub.
 
-A local pass is evidence for the code, not for the hosted release. PR #14 records local permissions API 14/14, P0 journey 7/7 and discovery browser 7/7, with both builds/lints and backend checks. These are recorded historical results, not reruns during this documentation refresh. The hosted seed, exact deployed commit and rehearsal still require release evidence. Public HTTP smoke during the refresh returned health/discovery 200, anonymous me 401 and unknown API 404; it does not replace that work.
+A local pass is evidence for the code, not for the hosted release. PR #14 records local permissions API 14/14, P0 journey 7/7 and discovery browser 7/7, with both builds/lints and backend checks. PR #15 records the expanded discovery browser suite at 8/8, including maximum-length text and heading checks at 320px. These are recorded historical results, not reruns during this documentation refresh. The hosted seed, exact deployed commit and rehearsal still require release evidence. Public HTTP smoke during the refresh returned health/discovery 200, anonymous me 401 and unknown API 404; it does not replace that work.
 
 For development before the API exists, `VITE_DISCOVERY_SOURCE=fixtures npm --prefix frontend run dev` makes discovery read the fictional fixture behind a visible "fictional fixture data" banner. Never use it for the demo.
 
