@@ -115,6 +115,37 @@ describe('discovery UI', { skip }, () => {
     await page.close();
   });
 
+  test('sector suggestions stay readable on the dark page (contrast >= 4.5:1)', async () => {
+    const page = await browser.newPage();
+    await page.goto(`${BASE}/explore`);
+    await settled(page);
+    await page.getByRole('combobox', { name: 'Sector' }).click();
+    const list = page.getByRole('listbox', { name: 'Sector suggestions' });
+    await list.waitFor();
+    const ratios = await list.evaluate((ul) => {
+      const rgb = (s) => (s.match(/[\d.]+/g) || []).map(Number);
+      const lum = (c) => {
+        const f = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+        return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+      };
+      const bgOf = (el) => {
+        for (let e = el; e; e = e.parentElement) {
+          const c = rgb(getComputedStyle(e).backgroundColor);
+          if (c.length === 3 || c[3] > 0.5) return c;
+        }
+        return [255, 255, 255];
+      };
+      return [...ul.querySelectorAll('[role=option]')].map((li) => {
+        const a = lum(rgb(getComputedStyle(li).color));
+        const b = lum(bgOf(li));
+        return { name: li.textContent, ratio: (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) };
+      });
+    });
+    assert.ok(ratios.length > 0);
+    for (const r of ratios) assert.ok(r.ratio >= 4.5, `${r.name} contrast ${r.ratio.toFixed(2)}:1`);
+    await page.close();
+  });
+
   test('no-results state offers a way back', async () => {
     const page = await browser.newPage();
     await page.goto(`${BASE}/explore?skill=zz-no-such-skill-e2e`);
