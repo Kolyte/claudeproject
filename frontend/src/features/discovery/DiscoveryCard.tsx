@@ -2,7 +2,9 @@ import { Link } from 'react-router-dom';
 import { formatUpdate, stageLabel } from './filters.ts';
 import type { ProjectSummary } from './types.ts';
 
-export default function DiscoveryCard({ project }: { project: ProjectSummary }) {
+/** `headingLevel` keeps the outline valid: 2 directly under the page h1 (Explore), 3 under a section h2 (Landing). */
+export default function DiscoveryCard({ project, headingLevel = 3 }: { project: ProjectSummary; headingLevel?: 2 | 3 }) {
+  const Title = headingLevel === 2 ? 'h2' : 'h3';
   const skills = project.requiredSkills.slice(0, 4);
   const extraSkills = project.requiredSkills.length - skills.length;
 
@@ -18,7 +20,7 @@ export default function DiscoveryCard({ project }: { project: ProjectSummary }) 
             </span>
           )}
         </div>
-        <h3 className="disc-card-title">{project.title}</h3>
+        <Title className="disc-card-title">{project.title}</Title>
         <p className="disc-card-pitch">{project.pitch}</p>
         <p className="small muted disc-card-meta">
           <span aria-label="Location">📍 {project.location}</span> · by {project.ownerDisplayName}
