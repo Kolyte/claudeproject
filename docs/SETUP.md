@@ -4,7 +4,7 @@
 
 The repository contains the React/Vite frontend, Express API, type-only shared contracts, six-table Supabase schema with RLS, and one-service Render configuration. The active application uses Supabase-backed APIs. Fictional fixtures are preserved for isolated development and explicit seeding.
 
-The app is hosted at [north-east-origins.onrender.com](https://north-east-origins.onrender.com/). See [P1 issue #1](https://github.com/Kolyte/claudeproject/issues/1) for the verified release commit, provider setup and remaining hosted acceptance evidence. A reachable deployment alone does not complete the two-account acceptance journey.
+The hosted preview is [north-east-origins.onrender.com](https://north-east-origins.onrender.com/). [P1 issue #1](https://github.com/Kolyte/claudeproject/issues/1) records the last verified deploy at `025a5d8098066e443e49fc129517b599ac3e556a`, three applied migrations, Auth redirects and real confirmation/login/profile checks. Later redesign, logo, opportunities and sector changes are on main; their deployment needs separate verification. Read-only HTTP checks on 4 November 2026 returned health 200, discovery 200, anonymous `/api/me` 401 and unknown API JSON 404, all with `X-Robots-Tag: noindex, nofollow`. Reachability does not identify the running commit or complete hosted acceptance.
 
 Use Node.js 24 (the coordination checker requires Node 22 or newer):
 
@@ -48,7 +48,7 @@ Frontend dev remains on port 5173 and proxies `/api` to `http://localhost:3001`.
 
 Complete `backend/.env` and `frontend/.env` files are checked in with the shared hosted demo URL and publishable key. These are public connection settings; the key also ships in the frontend bundle and relies on RLS. `.env.example` files describe the variables for other environments. Other `.env.*` files remain ignored; administrative and account credentials belong in provider settings or ignored local files. Frontend variables are public build inputs.
 
-For a local Supabase stack, replace the URL and publishable key in both app `.env` files with the local stack's values. Production Render variables override the backend `.env`, including `PORT` and `NODE_ENV`.
+For a local Supabase stack, replace the URL and publishable key in both app `.env` files with the local stack's values and keep those edits uncommitted. Tracked defaults target the shared hosted demo: confirm the target before writing test data. Production Render variables override the backend `.env`, including `PORT` and `NODE_ENV`.
 
 | Variable | Location | Use |
 |---|---|---|
@@ -59,21 +59,25 @@ For a local Supabase stack, replace the URL and publishable key in both app `.en
 | `PORT` | Backend | Local default 3001; Render-provided in production |
 | `NODE_ENV` | Backend | `production` on hosting |
 | `SUPABASE_SERVICE_ROLE_KEY` | Local seed process only | Optional privileged fixture/account bootstrap; never normal API or frontend |
-| `DEMO_FOUNDER_ID`, `DEMO_CONTRIBUTOR_ID` | Local seed process | Confirmed demo account UUIDs, not passwords |
+| `DEMO_FOUNDER_ID`, `DEMO_CONTRIBUTOR_ID`, `DEMO_UNRELATED_ID` | Local seed process | Three distinct prepared Auth account UUIDs, not passwords |
+| `DEMO_FOUNDER_NAME`, `DEMO_CONTRIBUTOR_NAME`, `DEMO_UNRELATED_NAME` | Local seed process | Optional fictional display names |
+| `VITE_DISCOVERY_SOURCE` | Frontend development/build | Explicit `fixtures` mode for isolated development; omit for the live demo |
 
 The public key relies on RLS. Verify each protected table's policies before enabling anonymous access. P1 validates credentials on server start without logging values. The application uses relative `/api` URLs; no second production origin is required. Express verifies tokens through Supabase Auth, then passes the caller's token to its database client. Administrative credentials are not deployed to the web API.
 
 ## Supabase setup and migrations
 
-1. P1 creates the six P0 tables, constraints, indexes, RLS policies and restricted review-summary helper defined in [contracts](CONTRACTS.md).
-2. Store ordered SQL migrations under `supabase/migrations/`. P1 applies them serially through the chosen Supabase migration tooling and records the applied versions in the P1 task issue. Never rewrite applied migrations.
+1. The six P0 tables, constraints, indexes, RLS policies and restricted `application_review_summary(application_id uuid)` helper are implemented in `supabase/migrations/`, as defined in [contracts](CONTRACTS.md).
+2. Migrations `202611040001`–`202611040003` are recorded as applied to hosted Supabase in issue #1. For another environment, P1 applies migrations serially and records the target and versions. Never rewrite applied migrations or reapply to a shared target just to run tests.
 3. Set the Auth Site URL and allowed redirect URLs to the local frontend and actual deployed origin. Test signup, email confirmation and login using the chosen demo project's settings.
-4. P5 implements `scripts/seed-demo.mjs` against the contract. It uses dedicated stable UUIDs and upserts only explicitly tagged demo records. It verifies the founder account exists and must not delete unrelated data. Any service-role key is used locally for this task only.
+4. P5's implemented `scripts/seed-demo.mjs` uses stable demo UUIDs, verifies all three prepared accounts exist and checks record ownership before upserting. It never deletes unrelated data. Unconfirmed accounts produce a warning rather than a failure, so confirm them before rehearsal. Service-role credentials are local to this seed process only. Applying the hosted seed still needs its own recorded evidence.
 5. P5 verifies owner, applicant, unrelated-account and anonymous access using real JWTs, including direct database requests that exercise RLS.
 
 Initial data belongs only to the fictional demo project. A successful seed is not evidence of real users, verified traction or NHS affiliation. See [DEMO.md](DEMO.md).
 
 ## Render deployment
+
+Deployment is a separate authorized action; merging application or documentation PRs does not deploy the service automatically.
 
 Use one Node web service connected to this repository, with the repository root as its working directory. Set Node.js 24 in hosting configuration:
 
@@ -103,3 +107,39 @@ The workflow has only repository-content and pull-request read permissions. It c
 Overlap warnings are advisory because PRs may change while a check runs. P5 rechecks open PRs and latest main immediately before each merge. Lane prefixes identify an agreed workstream, not a person's GitHub identity. Do not claim an atomic lock or access-control boundary from these checks.
 
 GitHub reference: [About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches). CODEOWNERS can be added by P1 once real reviewer handles are supplied; no fictional handles are installed.
+
+## Local stack and validation coverage
+
+The dedicated local Supabase configuration uses API port 55421, database 55422 and Mailpit 54324. With Docker and the Supabase CLI available, start it from the root:
+
+```sh
+npx supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+```
+
+This starts the local stack rather than migrating hosted Supabase. Local email confirmation is enabled. The disposable-account P0 test refuses remote targets.
+
+Dependency-free checks from the repository root, using Node 24:
+
+```sh
+node --test scripts/coordination/check-ownership.test.mjs
+node scripts/coordination/check-ownership.mjs --base origin/main --branch p1/your-task
+node --test fixtures/demo-dataset.test.mjs
+node scripts/seed-demo.mjs --dry-run
+node --test backend/src/features/discovery/discovery.test.ts frontend/src/features/discovery/discovery.test.mjs
+```
+
+The discovery suites include sector-list parity, suggestions and filter validation. With existing package dependencies installed:
+
+```sh
+npm --prefix backend test
+npm --prefix backend run typecheck
+npm --prefix backend run lint
+npm --prefix frontend run lint
+npm --prefix backend run build
+npm --prefix frontend run build
+npm --prefix backend run smoke:production
+```
+
+From `backend/`, also run `npx tsx --test src/features/opportunities/opportunities.test.ts`. Those tests use an in-memory repository; they do not prove RLS.
+
+The default backend test script runs only `src/lib/*.test.ts`. Platform CI builds/lints both packages, runs those tests and the compiled production smoke; it currently omits discovery, fixtures, opportunities and browser suites. Run feature checks explicitly and request a P1 CI update. [DEMO.md](DEMO.md) documents browser/permission environments. An environment-related skip or earlier local pass does not count as hosted acceptance.
