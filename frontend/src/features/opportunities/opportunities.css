@@ -1,0 +1,19 @@
+/* Opportunities feature. All selectors use the op- prefix; shared .btn, .card,
+   .chip, .skill, .need, .field and .neo-* styles come from the app's global sheets. */
+.op-needs { display: flex; flex-direction: column; gap: 4px; }
+.op-need-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px 12px; flex-wrap: wrap; }
+.op-need-head h2, .op-need-head h3 { margin: 0; overflow-wrap: anywhere; }
+.op-need-head > .badge, .op-need-head > .chip { flex-shrink: 0; }
+.op-status { text-transform: capitalize; }
+.op-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.op-self-start { align-self: flex-start; }
+.op-stack { display: flex; flex-direction: column; gap: 10px; }
+.op-stack > p { margin: 0; }
+.op-form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.op-field-error { color: #a63d2d; font-weight: 500; font-size: 0.8rem; }
+.op-inline-select { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 600; }
+.op-inline-select select { padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); font: inherit; font-weight: 400; background: var(--surface); }
+.op-page { max-width: 760px; display: flex; flex-direction: column; gap: 14px; }
+.op-page .page-title { margin: 0; }
+.op-page .op-need-head p { margin: 0; }
+.op-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
