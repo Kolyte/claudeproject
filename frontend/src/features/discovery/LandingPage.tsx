@@ -22,7 +22,7 @@ export default function LandingPage() {
   return (
     <div className="disc-landing">
       <section className="disc-hero">
-        <h1>Discover what the North East is building.</h1>
+        <div className="disc-hero-copy"><p className="disc-eyebrow">Projects · People · Progress / North East England</p><h1>Discover what the North East is building.</h1>
         <p className="disc-hero-lead">
           Find a project worth joining, or the people who can help build yours.
         </p>
@@ -45,6 +45,20 @@ export default function LandingPage() {
             </Link>
           ))}
         </div>
+        </div>
+        <aside className="disc-intro-ticket" aria-label="Your next project starts here">
+          <div className="disc-ticket-band">North East Origins / Open invitation</div>
+          <div className="disc-ticket-content">
+            <h2>Good things start<br />with people.</h2>
+            <p>An idea on your doorstep. A skill someone needs. A little time to make something happen.</p>
+            <dl className="disc-ticket-facts">
+              <div><dt>Where</dt><dd>North East England</dd></div>
+              <div><dt>Who</dt><dd>Founders &amp; contributors</dd></div>
+              <div><dt>Starting point</dt><dd>Any stage, even an idea</dd></div>
+            </dl>
+            <Link className="disc-ticket-link" to="/projects/new">Share what you are building →</Link>
+          </div>
+        </aside>
       </section>
 
       <FixtureNotice />
