@@ -6,6 +6,7 @@ import { MyApplicationsPage, ReviewApplicationsPage } from './features/opportuni
 import { LandingPage, ExplorePage } from './features/discovery/index.ts'
 import { Feedback } from './components/ui/Feedback'
 import { PricingPage } from './components/ui/PricingPage'
+import { ProjectMap } from './components/ui/ProjectMap'
 import { message } from './lib/api'
 import bridgeLogo from './assets/north-east-origins-bridge.svg'
 import './App.css'
@@ -35,7 +36,7 @@ function AppRoutes() {
   return <Routes key={session?.user.id ?? 'public'}><Route element={<Shell />}>
     <Route path="/login" element={<LoginPage />} /><Route path="/signup" element={<SignupPage />} />
       <Route path="/pricing" element={<PricingPage />} />
-      <Route index element={<LandingPage />} /><Route path="/explore" element={<ExplorePage />} />
+      <Route index element={<><LandingPage /><ProjectMap /></>} /><Route path="/explore" element={<ExplorePage />} />
       <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
       <Route path="/projects/new" element={<RequireAuth><NewProjectPage /></RequireAuth>} />
       <Route path="/projects/:projectId" element={<ProjectPage />} />

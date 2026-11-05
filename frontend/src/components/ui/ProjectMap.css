@@ -1,0 +1,38 @@
+.neo-map { margin: 16px 0 64px; }
+.neo-map-heading { display:flex; justify-content:space-between; align-items:end; gap:24px; border-top:1px solid var(--color-line-on-dark); padding-top:24px; }
+.neo-map-heading h2 { font-size:clamp(1.7rem,3vw,2.5rem); margin:8px 0; }
+.neo-map-eyebrow { font-size:.75rem; letter-spacing:.13em; text-transform:uppercase; }
+.neo-map > p { max-width:75ch; color:var(--color-muted-on-dark); }
+.neo-map-workspace { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr); border:1px solid var(--color-line-on-dark); }
+.neo-map-canvas { position:relative; min-width:0; aspect-ratio:1; background:var(--color-canvas); overflow:hidden; }
+.neo-map-canvas svg { display:block; width:100%; height:100%; }
+.neo-map-grid { color:var(--color-muted-on-dark); opacity:.2; }
+.neo-map-land { fill:#202b2d; }
+.neo-map-coast { stroke:var(--color-muted-on-dark); stroke-width:1.5; fill:none; }
+.neo-map-label { fill:var(--color-text-on-dark); font:12px var(--font-body); paint-order:stroke; stroke:#202b2d; stroke-width:4px; stroke-linejoin:round; }
+.neo-map-sea { fill:var(--color-muted-on-dark); font:10px var(--font-body); letter-spacing:1px; }
+.neo-map-dot { position:absolute; transform:translate(-50%,-50%); display:grid; place-items:center; width:44px; height:44px; padding:0; border:0; background:transparent; cursor:pointer; border-radius:0; }
+.neo-map-dot span { width:15px; height:15px; border:3px solid var(--color-paper); background:var(--color-route-green); border-radius:50%; box-shadow:0 0 0 2px var(--color-canvas); }
+.neo-map-dot b { position:absolute; top:0; left:27px; padding:1px 4px; font:600 11px var(--font-body); color:var(--color-ink); background:var(--color-paper); }
+.neo-map-dot:hover span, .neo-map-dot[aria-pressed=true] span { background:var(--color-route-yellow); outline:2px solid var(--color-route-yellow); outline-offset:4px; }
+.neo-map-dot:focus-visible { outline:3px solid var(--color-focus-on-dark); outline-offset:0; z-index:2; }
+.neo-map-key { position:absolute; bottom:16px; left:16px; color:var(--color-text-on-dark); font-size:.8rem; background:var(--color-canvas); padding:8px; display:flex; align-items:center; gap:8px; }
+.neo-map-key i { width:12px; height:12px; border:2px solid var(--color-paper); border-radius:50%; background:var(--color-route-green); }
+.neo-map-ticket { background:var(--color-paper); color:var(--color-ink); border-top:5px solid var(--color-route-green); min-width:0; }
+.neo-map-band { background:var(--color-paper-band); padding:12px 24px; margin:0; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; }
+.neo-map-detail { padding:24px; overflow-wrap:anywhere; }
+.neo-map-detail h3 { color:var(--color-ink); font-size:clamp(1.5rem,2.5vw,2rem); font-weight:400; margin:8px 0 24px; }
+.neo-map-detail a:not(.btn) { color:var(--color-ink); text-decoration:underline; }
+.neo-map-detail a:focus-visible { outline:3px solid var(--color-focus-on-paper); outline-offset:4px; }
+.neo-map-detail dl { margin:24px 0; border-bottom:1px dashed var(--color-line-on-paper); padding-bottom:16px; }
+.neo-map-detail dl div { display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-top:1px solid var(--color-line-on-paper); }
+.neo-map-detail dt { color:var(--color-muted-on-paper); }
+.neo-map-detail dd { margin:0; text-align:right; }
+.neo-map-list { border-bottom:1px solid var(--color-line-on-dark); }
+.neo-map-list summary { padding:16px 0; cursor:pointer; min-height:44px; }
+.neo-map-list ul { list-style:none; margin:0; padding:0 0 16px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.neo-map-list button { width:100%; min-height:60px; text-align:left; padding:12px; border:1px solid var(--color-muted-on-dark); background:transparent; color:var(--color-text-on-dark); font:inherit; cursor:pointer; overflow-wrap:anywhere; }
+.neo-map-list button span { display:block; font-size:.8rem; color:var(--color-muted-on-dark); }
+.neo-map-list button[aria-pressed=true] { border-color:var(--color-route-yellow); box-shadow:inset 4px 0 var(--color-route-yellow); }
+.neo-map-list button[aria-pressed=true]::before { content:'Selected / '; }
+@media(max-width:759px) { .neo-map-workspace { grid-template-columns:1fr; } .neo-map-heading { display:block; } .neo-map-list ul { grid-template-columns:1fr; } .neo-map-label { font-size:14px; } .neo-map-detail { padding:20px; } }
